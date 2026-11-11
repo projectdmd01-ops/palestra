@@ -109,11 +109,15 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .colhead{display:grid;grid-template-columns:30px minmax(0,1fr) 12px minmax(0,1fr) 46px;gap:6px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
 .colhead span:nth-child(2),.colhead span:nth-child(4){padding-left:10px}
 .ov{gap:0}
-.ovhead{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px;padding:8px 14px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
-.ovhead span:last-child{text-align:right}
-.ovrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px 8px 8px;border-bottom:1px solid var(--line)}
+.ovhead{display:grid;grid-template-columns:44px minmax(0,1fr) 62px 76px;gap:8px;padding:8px 14px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
+.ovhead span:nth-child(3),.ovhead span:last-child{text-align:center}
+.ovrow{display:grid;grid-template-columns:44px minmax(0,1fr) 62px 76px;gap:8px;align-items:center;padding:8px 10px 8px 8px;border-bottom:1px solid var(--line)}
 .ovrow button{border:0;background:transparent;text-align:left;padding:0}
 .ovname{padding:6px 0!important}
+.ovrest{height:46px;border:1px solid var(--line2)!important;border-radius:10px;background:var(--surface2)!important;text-align:center!important;font-family:var(--display);font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;line-height:1.1;padding:0 4px!important;color:var(--muted)}
+.ovrest small{display:block;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.ovrest.on{background:var(--fg)!important;color:var(--bg);border-color:var(--fg)!important}.ovrest.on small{color:var(--bg)}
+.ovrest.paused{border-color:var(--fg)!important;color:var(--fg)}
 .ovload{min-width:76px;height:46px;border:1px solid var(--line2)!important;border-radius:10px;background:var(--bg2)!important;text-align:center!important;font-family:var(--display);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;line-height:1.05;padding:0 8px!important}
 .ovload small{font-size:11px;color:var(--muted)}
 .ovload.unset{border-style:dashed!important;color:var(--muted);font-size:14px}
@@ -122,7 +126,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .ovrow.done .st{background:var(--fg);border-color:var(--fg);color:var(--bg)}
 .ovrow.part .st{border-color:var(--fg);color:var(--fg)}
 .ovrow.done .ovname b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
-.ovname{min-width:0}.ovname b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ovname small{font-size:11px;color:var(--muted)}
+.ovname{min-width:0}.ovname b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:14px;font-weight:600;line-height:1.2;overflow:hidden;overflow-wrap:anywhere}.ovname small{font-size:11px;color:var(--muted)}
 .ovn{text-align:right;font-variant-numeric:tabular-nums}.ovn b{display:block;font-family:var(--display);font-size:15px;font-weight:600;white-space:nowrap}.ovn small{font-size:11px;color:var(--muted);white-space:nowrap}
 .lognav{display:flex;gap:8px;align-items:center;justify-content:space-between}
 .lognav .btn{flex:1;padding:12px}.lognav.top .btn{flex:0}.lognav.top span{font-size:12px;color:var(--muted)}
@@ -292,7 +296,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 <div class="dock" id="dock"><div class="dbox" id="dbox">
   <div class="dtop"><div class="dlabel" id="dlabel"></div>
     <div class="seg" role="group" aria-label="Modalità"><button data-act="mode" data-m="rest" id="m-rest">Recupero</button><button data-act="mode" data-m="sw" id="m-sw">Cronometro</button></div>
-    <button class="dmin" data-act="dock-min" id="dminbtn" aria-label="Riduci timer">▾</button></div>
+    <button class="dmin" data-act="dock-min" id="dminbtn" aria-label="Riduci timer">▾</button><button class="dmin" data-act="dock-hide" aria-label="Nascondi timer">✕</button></div>
   <div class="dmain"><button class="dadj ic" data-act="t-reset" id="t-reset" aria-label="Azzera">↺</button><button class="dadj" data-act="adj" data-d="-15" id="adjm">−15</button><button class="dtime" id="dtime" data-act="rest-edit" aria-label="Tocca per cambiare il tempo di recupero">0:00</button><button class="dadj" data-act="adj" data-d="15" id="adjp">+15</button><button class="dadj" data-act="t-extra" id="t-extra" hidden>Giro</button><button class="go" data-act="t-go" id="t-go">Start</button></div>
   <div class="dminrow"><span class="t" id="dmint">0:00</span><button class="go" data-act="t-go" id="t-go2">Start</button><button data-act="t-reset">↺</button></div>
 </div></div>
@@ -633,6 +637,8 @@ function getLoad(exId,kgT){prefs.loads=prefs.loads||{};const l=prefs.loads[exId]
   const h=history(exId);if(h.length){const m=metric(h[h.length-1].sets);return m.bw?0:m.top}
   if(kgT!==''&&kgT!=null&&isFinite(+kgT)&&+kgT>0)return+kgT;return null}
 function setLoad(exId,kg){prefs.loads=prefs.loads||{};prefs.loads[exId]={kg,ts:Date.now()};savePrefs()}
+function restBtnHtml(slot,rest){const d=activeProg().days[dayIdx]||{};const mine=T.mode==='rest'&&T.slot===slot&&T.day===d.id;
+  if(mine&&T.running)return fmtClock(T.left)+'<small>pausa</small>';if(mine&&T.paused)return fmtClock(T.left)+'<small>riprendi</small>';if(mine&&T.done)return'0:00<small>finito</small>';return'▶ '+fmtRest(rest)}
 function quickDone(s,slot){
   const d=activeProg().days[dayIdx],e=d.ex[slot],exId=slotEx(s,slot),n=e[1],kg=getLoad(exId,e[7]);
   if(kg==null)return false;
@@ -711,7 +717,7 @@ function renderWorkout(){
     const note=prefs.notes[exId]||enote;
     const isCur=cur&&cur.slot===slot,dn=Math.min(cnt,n);
     if(view!=='registra'){const ld=getLoad(exId,kgT),bw=isBW(exId);missing+=(ld==null&&dn<n)?1:0;
-      return`<div class="ovrow${dn>=n?' done':dn?' part':''}"><button class="st" data-act="quick" data-slot="${slot}" aria-label="${dn>=n?'Annulla fatto':'Segna fatto come previsto'}">${dn>=n?'✓':dn?dn+'/'+n:''}</button><button class="ovname" data-act="focus" data-slot="${slot}"><b>${esc(c.n)}</b><small>${n}×${lo}–${hi}${esc(rnote||'')} · rec ${fmtRest(rest)}${note?' · nota':''}</small></button><button class="ovload${ld==null?' unset':''}" data-act="loadedit" data-ex="${exId}" data-kgt="${kgT||''}">${ld==null?'+ kg':ld===0?'corpo<br>libero':fmtKg(ld)+'<small> kg</small>'}</button></div>`}
+      return`<div class="ovrow${dn>=n?' done':dn?' part':''}"><button class="st" data-act="quick" data-slot="${slot}" aria-label="${dn>=n?'Annulla fatto':'Segna fatto come previsto'}">${dn>=n?'✓':dn?dn+'/'+n:''}</button><button class="ovname" data-act="focus" data-slot="${slot}"><b>${esc(c.n)}</b><small>${n}×${lo}–${hi}${esc(rnote||'')}${note?' · nota':''}</small></button><button class="ovrest" data-act="rowrest" data-slot="${slot}" data-rest-slot="${slot}" data-rest="${rest}" aria-label="Avvia recupero">${restBtnHtml(slot,rest)}</button><button class="ovload${ld==null?' unset':''}" data-act="loadedit" data-ex="${exId}" data-kgt="${kgT||''}">${ld==null?'+ kg':ld===0?'corpo<br>libero':fmtKg(ld)+'<small> kg</small>'}</button></div>`}
     if(!isCur)return'';
     return`<article class="ex${cnt>=n?' complete':''} cur" data-card="${slot}">
       <div class="row"><div><span class="eyebrow">${esc(c.m)}${s.subs[slot]?' · al posto di '+esc(X(e[0]).n):''}${s.moved[slot]?' · rimandato':''}</span>
@@ -729,7 +735,7 @@ function renderWorkout(){
   }).join('');
   const pct=tot?Math.round(done/tot*100):0;
   const started=sessions[s.id]&&s.start;
-  const head=`<div class="sesshead"><span>${esc(d.name)}${d.dow?' · '+esc(d.dow):''}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="num">${done}/${tot}</span>${started?`<span class="num" id="elapsed">${fmtDur(Date.now()-s.start)}</span>`:''}</div>`;
+  const head=`${prefs.dockHidden?'<button class="btn small" data-act="dock-show" style="justify-self:end">⏱ Mostra timer</button>':''}<div class="sesshead"><span>${esc(d.name)}${d.dow?' · '+esc(d.dow):''}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="num">${done}/${tot}</span>${started?`<span class="num" id="elapsed">${fmtDur(Date.now()-s.start)}</span>`:''}</div>`;
   const finishBtn=s.finished?`<div class="banner good"><strong>Allenamento concluso</strong><span>Durata ${fmtDur((s.end||Date.now())-s.start)}. Puoi ancora correggere i dati.</span></div><button class="btn block" data-act="summary" data-id="${s.id}">Vedi riepilogo</button>`:`<button class="btn block" data-act="finish" ${done?'':'disabled'}>Termina allenamento</button>`;
   if(view==='registra'){
     const pc=Math.max(0,s.order.indexOf(cur?cur.slot:s.order[0])),last=pc>=s.order.length-1;
@@ -746,7 +752,7 @@ function renderWorkout(){
   ${att.dates.length?`<a class="banner ${att.v.c}" href="#progressi" style="text-decoration:none;color:inherit"><strong>Settimana ${att.thisWeek}/${att.goal} · ${att.v.t}</strong></a>`:''}
   ${head}
   ${missing?`<div class="banner info"><strong>Imposta i carichi</strong><span>Manca il carico per ${missing} ${missing===1?'esercizio':'esercizi'}: tocca <b>+ kg</b> e scrivilo una volta sola.</span></div>`:''}
-  <div class="list ov"><div class="ovhead"><span>Fatto</span><span>Esercizio</span><span>Carico</span></div>${cards}</div>
+  <div class="list ov"><div class="ovhead"><span>Fatto</span><span>Esercizio</span><span>Recupero</span><span>Carico</span></div>${cards}</div>
   ${s.finished?finishBtn:`<button class="btn primary block" data-act="quick-all">✓ Allenamento fatto come previsto</button>`}
   <button class="btn block ghost" data-act="start-log">${startLbl}</button>`;
 }
@@ -779,7 +785,8 @@ function tick(){
 const swNow=()=>T.sw.acc+(T.sw.run?Date.now()-T.sw.start:0);
 function fmtSw(ms){const t=Math.floor(ms/100),d=t%10,s=Math.floor(t/10)%60,m=Math.floor(t/600)%60,h=Math.floor(t/36000);return(h?h+':'+pad(m):pad(m))+':'+pad(s)+','+d}
 function updateDock(){
-  const box=$('#dbox'),mini=!!prefs.dockMin||view!=='registra';box.classList.toggle('min',mini);document.body.classList.toggle('dock-min',mini);document.body.classList.toggle('no-dock',view!=='registra'&&!T.running&&!T.sw.run);
+  const box=$('#dbox'),onW=view==='registra'||view==='allenamento',mini=!!prefs.dockMin||view!=='registra';box.classList.toggle('min',mini);document.body.classList.toggle('dock-min',mini);document.body.classList.toggle('no-dock',!!prefs.dockHidden||(!onW&&!T.running&&!T.sw.run));
+  document.querySelectorAll('[data-rest-slot]').forEach(el=>{const sl=+el.dataset.restSlot;const mine=T.mode==='rest'&&T.slot===sl&&T.day===(activeProg().days[dayIdx]||{}).id&&(T.running||T.paused||T.done);el.classList.toggle('on',mine&&T.running);el.classList.toggle('paused',mine&&T.paused);el.innerHTML=restBtnHtml(sl,+el.dataset.rest)});
   $('#dminbtn').textContent=mini?'▴':'▾';$('#dminbtn').setAttribute('aria-label',mini?'Espandi timer':'Riduci timer');
   $('#m-rest').setAttribute('aria-pressed',T.mode==='rest');$('#m-sw').setAttribute('aria-pressed',T.mode==='sw');
   const go=$('#t-go'),go2=$('#t-go2');
@@ -804,7 +811,7 @@ function timerGo(){
   audioUnlock();
   if(T.mode==='sw'){if(T.sw.run){T.sw.acc+=Date.now()-T.sw.start;T.sw.run=false}else{T.sw.start=Date.now();T.sw.run=true}updateDock();if(view==='profilo')render();return}
   if(T.running){T.left=Math.max(0,(T.end-Date.now())/1000);T.running=false;T.paused=true}
-  else{if(T.done||T.left<=0){T.left=T.preset;T.done=false}T.end=Date.now()+T.left*1000;T.running=true;T.paused=false}
+  else{if(T.done||T.left<=0){T.left=T.preset;T.done=false}if(!T.hold&&cur&&!(T.slot===cur.slot&&T.day===cur.day&&T.paused)){T.slot=cur.slot;T.day=cur.day}T.end=Date.now()+T.left*1000;T.running=true;T.paused=false}
   updateDock();
 }
 function timerReset(){if(T.mode==='sw'){T.sw={acc:0,start:0,run:false,laps:[]};updateDock();return}T.hold=false;T.running=false;T.paused=false;T.done=false;T.preset=cur?cur.rest:T.preset;T.left=T.preset;updateDock()}
@@ -1191,6 +1198,12 @@ document.addEventListener('click',e=>{
   case'adj':timerAdj(+b.dataset.d);return;
   case't-extra':if(T.mode==='sw'){if(!T.sw.run)return;const tot=swNow(),prev=T.sw.laps.length?T.sw.laps[T.sw.laps.length-1].tot:0;T.sw.laps.push({lap:tot-prev,tot});updateDock();if(view==='profilo')render()}else timerAdj((prefs.step||15)*2);return;
   case'mode':T.mode=b.dataset.m;updateDock();return;
+  case'dock-hide':prefs.dockHidden=true;savePrefs();render();toast('Timer nascosto: usa i pulsanti di recupero o «Mostra timer»');return;
+  case'dock-show':prefs.dockHidden=false;savePrefs();render();return;
+  case'rowrest':{const sl=+b.dataset.slot,day=activeProg().days[dayIdx];audioUnlock();T.mode='rest';
+    if(T.slot===sl&&T.day===day.id&&(T.running||T.paused)){timerGo();return}
+    T.hold=false;T.slot=sl;T.day=day.id;T.preset=+b.dataset.rest||90;T.left=T.preset;T.running=false;T.paused=false;T.done=false;
+    cur={slot:sl,day:day.id,exId:slotEx(getSession(),sl),rest:T.preset,name:X(slotEx(getSession(),sl)).n};timerGo();return}
   case'dock-min':if(view!=='registra'&&!prefs.dockMin){location.hash='registra';return}prefs.dockMin=!prefs.dockMin;savePrefs();updateDock();return;
   case'rest-edit':if(T.mode==='rest')restEditSheet();return;
   case'rs':restEditSheet.v=Math.max(5,Math.min(900,restEditSheet.v+ +b.dataset.d));$('#rsv').textContent=fmtRest(restEditSheet.v);return;
