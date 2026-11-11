@@ -8,10 +8,10 @@
 <style>
 /* Layout: app da strumento a una colonna; intestazione con logo, contenuto, dock del timer fisso sopra il menu in basso */
 :root{
-  --bg:#0a0c0f; --bg2:#0f1216; --surface:#13171d; --surface2:#1a1f27; --line:#242a33; --line2:#313844;
-  --fg:#edf0f4; --muted:#8a94a3; --dim:#5b6472;
-  --accent:#42c6f2; --accent-ink:#04141b; --accent-soft:rgba(66,198,242,.12); --accent-line:rgba(66,198,242,.4);
-  --good:#3fd98a; --good-soft:rgba(63,217,138,.13); --warn:#f2b54a; --warn-soft:rgba(242,181,74,.13); --bad:#ff5a6a; --bad-soft:rgba(255,90,106,.13);
+  --bg:#0b0b0b; --bg2:#101010; --surface:#151515; --surface2:#1c1c1c; --line:#262626; --line2:#353535;
+  --fg:#f2f2f2; --muted:#9b9b9b; --dim:#666666;
+  --accent:#f2f2f2; --accent-ink:#0b0b0b; --accent-soft:rgba(255,255,255,.07); --accent-line:rgba(255,255,255,.38);
+  --good:#f2f2f2; --good-soft:rgba(255,255,255,.07); --warn:#c4c4c4; --warn-soft:rgba(255,255,255,.05); --bad:#ffffff; --bad-soft:rgba(255,255,255,.1);
   --display:"Chakra Petch","Arial Narrow",Arial,sans-serif;
   --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
   color-scheme:dark;
@@ -21,7 +21,7 @@ html{background:var(--bg)}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-tap-highlight-color:transparent;min-height:100%}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background:
-  radial-gradient(120% 60% at 50% -10%,rgba(66,198,242,.10),transparent 60%),
+  radial-gradient(120% 60% at 50% -10%,rgba(255,255,255,.06),transparent 60%),
   linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px) 0 0/28px 28px,
   linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px) 0 0/28px 28px}
 button{font:inherit;color:inherit;cursor:pointer}
@@ -32,15 +32,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(10,12,15,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .top .wrap{padding-block:10px;display:grid;gap:8px}
 .brandrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{height:15px;width:auto;display:block;opacity:.95}
+.logo{height:24px;max-width:62%;width:auto;display:block;opacity:.95}
 .athlete{border:0;background:none;padding:4px 0;font-size:12px;color:var(--muted);max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right}
 .athlete b{color:var(--fg);font-weight:600}
 .athlete.unset{color:var(--accent)}
 .titlerow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-h1{font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.04em;margin:0;text-transform:uppercase;line-height:1.05}
+h1{font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted);letter-spacing:.16em;margin:0;text-transform:uppercase;line-height:1.05}
 .sub{font-size:12px;color:var(--muted);font-family:var(--display);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
 main{position:relative;z-index:1}
-main .wrap{padding-block:14px calc(250px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
+main .wrap{padding-block:14px calc(220px + env(safe-area-inset-bottom,0px));display:grid;gap:12px}
 body.dock-min main .wrap{padding-bottom:calc(150px + env(safe-area-inset-bottom,0px))}
 /* type */
 .eyebrow{font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
@@ -74,17 +74,17 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .chip.up{background:var(--good-soft);color:var(--good)}
 .chip.flat{background:var(--surface2);color:var(--muted);border-color:var(--line2)}
 .chip.down{background:var(--warn-soft);color:var(--warn)}
-.chip.down2{background:var(--bad-soft);color:var(--bad)}
-.chip.inc{background:var(--accent-soft);color:var(--accent)}
+.chip.down2{background:var(--bad-soft);color:var(--bad);border-color:var(--fg)}
+.chip.inc{background:var(--fg);color:var(--bg)}
 .chip.new{background:transparent;color:var(--muted);border:1px dashed var(--line2)}
 .chip.pr{background:var(--warn-soft);color:var(--warn)}
 .chip.acc{background:var(--accent-soft);color:var(--accent)}
 .banner{border-radius:12px;padding:10px 12px;font-size:13px;display:grid;gap:6px;border:1px solid var(--line)}
 .banner strong{font-size:14px}
 .banner.info{background:var(--accent-soft);border-color:var(--accent-line)}
-.banner.warn{background:var(--warn-soft);border-color:rgba(242,181,74,.35)} .banner.warn strong{color:var(--warn)}
-.banner.bad{background:var(--bad-soft);border-color:rgba(255,90,106,.35)} .banner.bad strong{color:var(--bad)}
-.banner.good{background:var(--good-soft);border-color:rgba(63,217,138,.3)} .banner.good strong{color:var(--good)}
+.banner.warn{background:var(--warn-soft);border-color:var(--line2)} .banner.warn strong{color:var(--warn)}
+.banner.bad{background:var(--bad-soft);border-color:var(--fg)} .banner.bad strong{color:var(--bad)}
+.banner.good{background:var(--good-soft);border-color:var(--line2)} .banner.good strong{color:var(--good)}
 .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;flex:1}
 .bar i{display:block;height:100%;background:var(--accent);transition:width .3s}
 .bar.good i{background:var(--good)} .bar.warn i{background:var(--warn)} .bar.bad i{background:var(--bad)}
@@ -99,7 +99,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .sesshead{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
 .ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;min-width:0}
 .ex.cur{border-color:var(--accent-line);box-shadow:0 0 0 1px var(--accent-line)}
-.ex.complete{border-color:rgba(63,217,138,.45)}
+.ex.complete{border-color:var(--line2);opacity:.8}
 .ex-title{border:0;background:none;padding:0;text-align:left;display:block;width:100%}
 .ex-title h3{display:inline}
 .meta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:2px}
@@ -118,16 +118,16 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .field em{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-style:normal;font-size:10px;color:var(--dim);pointer-events:none;text-transform:uppercase;letter-spacing:.06em}
 .x{color:var(--dim);font-size:12px;text-align:center}
 .check{height:46px;border-radius:10px;border:1px solid var(--line2);background:var(--surface2);font-size:19px;color:var(--muted)}
-.set.done .check{background:var(--good);border-color:var(--good);color:#04160c}
-.set.done input{border-color:rgba(63,217,138,.5)}
+.set.done .check{background:var(--good);border-color:var(--good);color:var(--accent-ink)}
+.set.done input{border-color:var(--line2);color:var(--muted)}
 .set .pr-star{position:absolute;left:-2px;top:-6px;font-size:10px;color:var(--warn)}
 .set label{position:relative}
 .finish{display:grid;gap:8px}
 /* timer dock */
 .dock{position:fixed;left:0;right:0;bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:6;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
-.dbox{grid-template-columns:minmax(0,1fr);max-width:664px;margin:0 auto 6px;background:rgba(19,23,29,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:16px;padding:8px 10px 10px;display:grid;gap:6px;box-shadow:0 12px 32px rgb(0 0 0 / .5)}
+.dbox{grid-template-columns:minmax(0,1fr);max-width:664px;margin:0 auto 6px;gap:4px!important;padding:6px 8px 8px!important;background:rgba(19,23,29,.96);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line2);border-radius:16px;padding:8px 10px 10px;display:grid;gap:6px;box-shadow:0 12px 32px rgb(0 0 0 / .5)}
 .dbox.running{border-color:var(--accent-line)}
-.dbox.done{border-color:var(--good);background:rgba(13,40,26,.97)}
+.dbox.done{border-color:var(--fg);background:var(--surface2)}
 .dtop{display:flex;align-items:center;gap:8px;justify-content:space-between}
 .dlabel{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
 .dlabel b{color:var(--fg);font-weight:600}
@@ -136,14 +136,14 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .seg button[aria-pressed="true"]{background:var(--surface2);color:var(--fg)}
 .dmin{border:0;background:none;color:var(--muted);font-size:16px;width:28px;height:24px;flex-shrink:0}
 .dmain{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px}
-.dtime{border:0;background:none;padding:0;min-width:0;font-family:var(--display);font-weight:700;font-size:42px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em;text-align:center}
+.dtime{border:0;background:none;padding:0;min-width:0;font-family:var(--display);font-weight:700;font-size:32px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em;text-align:center}
 .dbox.running .dtime{color:var(--accent)}
 .dbox.done .dtime{color:var(--good)}
-.dadj{width:52px;height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:600;font-size:15px}
+.dadj{width:48px;height:34px;border-radius:10px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:600;font-size:15px}
 .dctrl{display:grid;grid-template-columns:1fr 2fr 1fr;gap:6px}
-.dctrl button{min-width:0;height:44px;border-radius:11px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
-.dctrl .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:17px}
-.dctrl .go.pause{background:var(--warn);border-color:var(--warn);color:#1b1200}
+.dctrl button{min-width:0;height:38px;border-radius:11px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+.dctrl .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:15px}
+.dctrl .go.pause{background:transparent;border-color:var(--fg);color:var(--fg)}
 .dbox.min .dmain,.dbox.min .dctrl{display:none}
 .dminrow{display:none;align-items:center;gap:8px}
 .dbox.min .dminrow{display:flex}
@@ -218,7 +218,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .ed-ex .pick b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dl-chips{display:flex;flex-wrap:wrap;gap:6px}
 .dl-chips button{width:36px;height:32px;border-radius:8px;border:1px solid var(--line2);background:var(--bg2);font-family:var(--display);font-weight:600;font-size:13px;color:var(--muted)}
-.dl-chips button[aria-pressed="true"]{background:var(--warn);border-color:var(--warn);color:#1b1200}
+.dl-chips button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
 .stepper{display:flex;align-items:center;justify-content:center;gap:12px}
 .stepper b{font-family:var(--display);font-size:44px;min-width:130px;text-align:center;font-variant-numeric:tabular-nums}
 /* sheet */
@@ -230,7 +230,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .alt.on{border-color:var(--accent);background:var(--accent-soft)}
 .alt small{color:var(--muted)}
 .yt{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--accent);font-weight:600;font-size:14px}
-.confirm{display:grid;gap:8px;background:var(--warn-soft);border:1px solid rgba(242,181,74,.3);border-radius:10px;padding:10px 12px;font-size:13px}
+.confirm{display:grid;gap:8px;background:var(--warn-soft);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-size:13px}
 .vh{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .drop{border:1.5px dashed var(--line2);border-radius:12px;padding:16px;text-align:center;display:grid;gap:6px;justify-items:center}
 .files{display:grid;gap:4px;font-size:12px;color:var(--muted)}
@@ -566,7 +566,7 @@ function analyze(exId,hi,nSets,excludeId){
   if(streak>=2)status='down2';else if(allTop)status='inc';
   return{status,h,last,lm,d1,streak,flatRun,prev:h[h.length-2],allTop};
 }
-const LABEL={up:'In crescita',flat:'Stabile',down:'In calo',down2:'Calo ripetuto',inc:'Aumenta il peso',new:'Prima seduta',none:'Nessun dato'};
+const LABEL={up:'▲ In crescita',flat:'= Stabile',down:'▼ In calo',down2:'▼▼ Calo ripetuto',inc:'↑ Aumenta il peso',new:'Prima seduta',none:'Nessun dato'};
 const setsTxt=sets=>sets.map(x=>(num(x.kg)>0?fmtKg(num(x.kg))+'×':'')+num(x.reps)).join(' · ');
 function suggestion(a,exId){
   if(!a||a.status==='none')return null;
@@ -673,7 +673,7 @@ function renderWorkout(){
       ${sug?`<div class="hint ${sug.cls}"><span>${sug.t}</span>${sug.kg?`<button class="btn small" data-act="apply-kg" data-ex="${exId}" data-kg="${sug.kg}" data-n="${nRows}">Applica</button>`:''}</div>`:''}
       ${note?`<div class="exnote">${esc(note)}</div>`:''}
       <div class="sets">${rows}</div>
-      <div class="actions"><button class="btn small" data-act="add-set" data-ex="${exId}">+ Serie</button><button class="btn small" data-act="swap" data-slot="${slot}">Macchina occupata?</button>${pos<s.order.length-1?`<button class="btn small" data-act="later" data-pos="${pos}">Fallo dopo</button>`:''}<button class="btn small ghost" data-act="exinfo" data-ex="${exId}">Note e storico</button></div>
+      <div class="actions"><button class="btn small" data-act="add-set" data-ex="${exId}">+ Serie</button><button class="btn small" data-act="swap" data-slot="${slot}">Macchina occupata?</button>${pos<s.order.length-1?`<button class="btn small" data-act="later" data-pos="${pos}">Fallo dopo</button>`:''}<button class="btn small ghost" data-act="exinfo" data-ex="${exId}">Note e storico</button><button class="btn small ghost" data-act="exmenu" data-slot="${slot}" data-ex="${exId}">⋯ Modifica</button></div>
     </article>`;
   }).join('');
   const pct=tot?Math.round(done/tot*100):0;
@@ -707,7 +707,8 @@ function audioUnlock(){try{actx=actx||new (window.AudioContext||window.webkitAud
 function beep(){if(prefs.sound!==false){try{audioUnlock();[0,.3,.6].forEach((o,i)=>{const os=actx.createOscillator(),g=actx.createGain();os.type='sine';os.frequency.value=i===2?1320:880;g.gain.setValueAtTime(.0001,actx.currentTime+o);g.gain.exponentialRampToValueAtTime(.3,actx.currentTime+o+.02);g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+o+.22);os.connect(g);g.connect(actx.destination);os.start(actx.currentTime+o);os.stop(actx.currentTime+o+.25)})}catch(e){}}
   if(prefs.vib!==false){try{navigator.vibrate&&navigator.vibrate([250,120,250,120,400])}catch(e){}}}
 function tick(){
-  if(T.running){T.left=(T.end-Date.now())/1000;if(T.left<=0){T.left=0;T.running=false;T.paused=false;T.done=true;beep();toast('Recupero finito: serie successiva')}}
+  if(T.running){T.left=(T.end-Date.now())/1000;if(T.left<=0){T.left=0;T.running=false;T.paused=false;T.done=true;T.doneAt=Date.now();beep();toast('Recupero finito: serie successiva')}}
+  if(T.done&&!T.running&&Date.now()-(T.doneAt||0)>4000){T.done=false;T.left=T.preset}
   updateDock();const el=view==='allenamento'&&$('#elapsed');if(el){const s=sessions[getSession().id];if(s&&s.start)el.textContent=fmtDur((s.end&&s.finished?s.end:Date.now())-s.start)}
   const sw=$('#swbig');if(sw)sw.textContent=fmtSw(swNow());
 }
@@ -720,7 +721,7 @@ function updateDock(){
   const go=$('#t-go'),go2=$('#t-go2');
   if(T.mode==='rest'){
     const txt=fmtClock(T.left);$('#dtime').textContent=txt;$('#dmint').textContent=txt;
-    $('#dlabel').innerHTML=T.done?'<b>Recupero finito</b> · tocca Start per ripartire':cur?'<b>'+esc(cur.name)+'</b>':'Recupero';
+    $('#dlabel').innerHTML=T.done?'<b>Recupero finito</b>':cur?'<b>'+esc(cur.name)+'</b>':'Recupero';
     box.classList.toggle('running',T.running);box.classList.toggle('done',T.done&&!T.running);
     const lab=T.running?'Pausa':T.paused?'Riprendi':'Start';go.textContent=lab;go2.textContent=lab;go.classList.toggle('pause',T.running);
     const st=prefs.step||15;$('#adjm').textContent='−'+st;$('#adjp').textContent='+'+st;$('#adjm').dataset.d=-st;$('#adjp').dataset.d=st;
@@ -838,7 +839,8 @@ function progCard(p,active){
   const status=w.ended?`<span class="chip down2">Durata finita</span>`:w.ending?`<span class="chip down">In scadenza</span>`:'';
   return`<article class="card prog${active?' active':''}"><div class="row"><div><span class="eyebrow">${active?'Scheda attiva':p.archived?'Archiviata':'Disponibile'}</span><h3>${esc(p.name)}</h3><p class="note">${p.days.length} giorni · ${nEx} esercizi · dal ${fmtDate(p.start)}</p></div>${active?status||'<span class="chip acc">Attiva</span>':status}</div>
   ${active||!p.archived?`${weekBar(p)}<p class="note">${w.ended?'Finita da '+(w.week-w.weeks)+' sett.':'Settimana '+w.week+' di '+w.weeks+(w.left>0?' · ne mancano '+w.left:' · ultima')}${(p.deload||[]).length?' · scarico in sett. '+p.deload.join(', '):''}</p>`:''}
-  <div class="actions">${active?'':`<button class="btn small primary" data-act="activate" data-id="${p.id}">Usa questa</button>`}<button class="btn small" data-act="edit" data-id="${p.id}">Modifica</button><button class="btn small" data-act="dup" data-id="${p.id}">Duplica</button>${active&&(w.ending||w.ended)?`<button class="btn small" data-act="extend" data-id="${p.id}" data-w="2">+2 sett.</button>`:''}${active?'':p.archived?`<button class="btn small" data-act="unarchive" data-id="${p.id}">Ripristina</button>`:`<button class="btn small" data-act="archive" data-id="${p.id}">Archivia</button>`}${active?'':`<button class="btn small danger" data-act="del" data-id="${p.id}">Elimina</button>`}</div>
+  <div class="actions">${active?'':`<button class="btn small primary" data-act="activate" data-id="${p.id}">Usa questa</button>`}<button class="btn small" data-act="edit" data-id="${p.id}">Modifica</button><button class="btn small" data-act="dup" data-id="${p.id}">Duplica</button>${active&&(w.ending||w.ended)?`<button class="btn small" data-act="extend" data-id="${p.id}" data-w="2">+2 sett.</button>`:''}${active?'':p.archived?`<button class="btn small" data-act="unarchive" data-id="${p.id}">Ripristina</button>`:`<button class="btn small" data-act="archive" data-id="${p.id}">Archivia</button>`}${p.id==='base'?`<button class="btn small" data-act="base-reset">Ripristina originale</button>`:''}${programs().length>1?`<button class="btn small danger" data-act="del" data-id="${p.id}">Elimina</button>`:''}</div>
+  ${confirmDel==='base-reset'&&p.id==='base'?`<div class="confirm">Riporti questa scheda agli esercizi e ai parametri originali? Gli allenamenti fatti restano.<div class="actions"><button class="btn small danger" data-act="base-reset-yes">Sì, ripristina</button><button class="btn small" data-act="del-no">Annulla</button></div></div>`:''}
   ${confirmDel===p.id?`<div class="confirm">Elimini la scheda «${esc(p.name)}»? Gli allenamenti fatti restano nello storico.<div class="actions"><button class="btn small danger" data-act="del-yes" data-id="${p.id}">Sì, elimina</button><button class="btn small" data-act="del-no">Annulla</button></div></div>`:''}
   </article>`;
 }
@@ -928,6 +930,7 @@ function renderProfile(){
   <div class="actions"><button class="btn primary" data-act="bk-export">Esporta backup</button><label class="btn" for="bk-file">Ripristina da file</label><input type="file" id="bk-file" accept=".json,application/json,text/plain" class="vh"><button class="btn" data-act="export-xlsx">Excel</button><button class="btn" data-act="export-pdf">PDF</button></div>
   ${ab?`<button class="btn small ghost" data-act="bk-auto">Recupera la copia automatica del ${fmtDate(ab.date)}</button>`:''}
   <div id="bk-status" class="note" aria-live="polite"></div></section>
+  <section class="card"><span class="eyebrow">Ripristino</span><div class="actions"><button class="btn small" data-act="prefs-reset">Impostazioni predefinite</button><button class="btn small danger" data-act="wipe">Cancella tutti i dati</button></div><div id="wipe-confirm"></div></section>
   <section class="card"><span class="eyebrow">Guida rapida</span><ul class="note" style="padding-left:16px;display:grid;gap:4px"><li>Allenati: tocca ✓ su ogni serie, i valori dell'ultima volta sono già pronti.</li><li>Il timer in basso prende il recupero dell'esercizio che stai facendo; tocca il tempo per cambiarlo.</li><li>Schede: importa PDF, Excel, CSV, foto o testo; prima di salvare puoi correggere tutto.</li><li>Ogni scheda conta le settimane da sola e ti avvisa quando sta per finire.</li></ul></section>`;
 }
 let bkPending=null;
@@ -1148,6 +1151,24 @@ document.addEventListener('click',e=>{
     openSheet(`<span class="eyebrow">${esc(X(orig).m)}</span><h2>Scegli un'alternativa</h2><p class="note">Stesse serie e ripetizioni. I carichi si salvano sull'esercizio che fai davvero.</p>${opts.map(id=>`<button class="alt${id===c?' on':''}" data-act="pick-alt" data-slot="${slot}" data-id="${id}"><span>${esc(X(id).n)}${id===orig?' <small>(originale)</small>':''}</span><small>${id===c?'in uso':''}</small></button>`).join('')}<button class="btn" data-act="alt-other" data-slot="${slot}">Cerca un altro esercizio</button>`);return}
   case'pick-alt':{const slot=+b.dataset.slot,id=b.dataset.id,orig=activeProg().days[dayIdx].ex[slot][0];if(id===orig)delete s.subs[slot];else s.subs[slot]=id;persist(s);closeSheet();cur=null;render();return}
   case'alt-other':closeSheet();pickerSheet({type:'alt',slot:+b.dataset.slot});return;
+  case'exmenu':{const slot=+b.dataset.slot,exId=b.dataset.ex,e=activeProg().days[dayIdx].ex[slot],o=e[9];
+    openSheet(`<span class="eyebrow">Modifica esercizio</span><h2>${esc(X(exId).n)}</h2>
+    <div class="card tight"><span class="eyebrow">Valori predefiniti nella scheda</span>
+    <div class="ed-grid g6"><div class="ed-field"><label for="m-s">Serie</label><input id="m-s" inputmode="numeric" value="${e[1]}"></div><div class="ed-field"><label for="m-lo">Rip. min</label><input id="m-lo" inputmode="numeric" value="${e[2]}"></div><div class="ed-field"><label for="m-hi">Rip. max</label><input id="m-hi" inputmode="numeric" value="${e[3]}"></div>
+    <div class="ed-field"><label for="m-rir">RIR</label><input id="m-rir" value="${esc(e[4])}"></div><div class="ed-field"><label for="m-rec">Recupero sec</label><input id="m-rec" inputmode="numeric" value="${e[5]}"></div><div class="ed-field"><label for="m-kg">Carico kg</label><input id="m-kg" inputmode="decimal" value="${esc(e[7]??'')}" placeholder="—"></div></div>
+    <div class="actions"><button class="btn small primary" data-act="m-save" data-slot="${slot}">Salva come predefinito</button>${o?`<button class="btn small" data-act="m-orig" data-slot="${slot}">Ripristina valori originali</button>`:''}</div></div>
+    <div class="card tight"><span class="eyebrow">Solo l'allenamento di oggi</span><div class="actions"><button class="btn small" data-act="m-clear" data-ex="${exId}">Cancella le serie di oggi</button>${s.extra[exId]?`<button class="btn small" data-act="m-noextra" data-ex="${exId}">Togli le serie aggiunte</button>`:''}${s.subs[slot]?`<button class="btn small" data-act="pick-alt" data-slot="${slot}" data-id="${e[0]}">Torna all'esercizio originale</button>`:''}</div></div>
+    <div class="card tight"><span class="eyebrow">Scheda</span><div class="actions"><button class="btn small danger" data-act="m-del" data-slot="${slot}">Togli l'esercizio dalla scheda</button></div><div id="m-confirm"></div></div>`);return}
+  case'm-save':{const p=activeProg(),e=p.days[dayIdx].ex[+b.dataset.slot];if(!e[9])e[9]=e.slice(0,9);
+    e[1]=clampInt($('#m-s').value,1,15,e[1]);e[2]=clampInt($('#m-lo').value,1,100,e[2]);e[3]=Math.max(e[2],clampInt($('#m-hi').value,1,100,e[3]));e[4]=($('#m-rir').value||e[4]).slice(0,8);e[5]=clampInt($('#m-rec').value,5,900,e[5]);const k=num($('#m-kg').value);e[7]=k>0?k:'';
+    saveProgs();cur=null;closeSheet();toast('Salvato come predefinito');render();return}
+  case'm-orig':{const p=activeProg(),e=p.days[dayIdx].ex[+b.dataset.slot];if(e[9]){const o=e[9];for(let i=1;i<9;i++)e[i]=o[i];e.length=9}saveProgs();cur=null;closeSheet();toast('Valori originali ripristinati');render();return}
+  case'm-clear':{delete s.log[b.dataset.ex];s.prs=(s.prs||[]).filter(p=>p.ex!==b.dataset.ex);persist(s);closeSheet();toast('Serie di oggi cancellate');render();return}
+  case'm-noextra':{const ex=b.dataset.ex,n=s.extra[ex]||0;delete s.extra[ex];const d=activeProg().days[dayIdx].ex.find(e=>e[0]===ex);const base=d?d[1]:3;if(s.log[ex])s.log[ex]=s.log[ex].slice(0,base);persist(s);closeSheet();render();return}
+  case'm-del':$('#m-confirm').innerHTML=`<div class="confirm">Togli questo esercizio dalla scheda? I dati già registrati restano nello storico.<div class="actions"><button class="btn small danger" data-act="m-del-yes" data-slot="${b.dataset.slot}">Sì, togli</button><button class="btn small" data-act="close">Annulla</button></div></div>`;return;
+  case'm-del-yes':{const p=activeProg(),d=p.days[dayIdx],slot=+b.dataset.slot;d.ex.splice(slot,1);
+    const sid=sessionId(p,d);if(sessions[sid]){const ss=sessions[sid];ss.order=(ss.order||[]).filter(i=>i!==slot).map(i=>i>slot?i-1:i);const subs={},mv={};Object.keys(ss.subs||{}).forEach(k=>{const i=+k;if(i!==slot)subs[i>slot?i-1:i]=ss.subs[k]});Object.keys(ss.moved||{}).forEach(k=>{const i=+k;if(i!==slot)mv[i>slot?i-1:i]=ss.moved[k]});ss.subs=subs;ss.moved=mv;persist(ss)}
+    saveProgs();cur=null;closeSheet();toast('Esercizio tolto dalla scheda');render();return}
   case'finish':{s.end=Date.now();s.finished=true;persist(s);render();summarySheet(s.id);return}
   }
   switch(act){
@@ -1167,7 +1188,9 @@ document.addEventListener('click',e=>{
   case'archive':case'unarchive':{const p=programs().find(x=>x.id===b.dataset.id);p.archived=act==='archive';saveProgs();render();return}
   case'del':confirmDel=b.dataset.id;render();return;
   case'del-no':confirmDel=null;render();return;
-  case'del-yes':progDoc.list=programs().filter(p=>p.id!==b.dataset.id);confirmDel=null;saveProgs();toast('Scheda eliminata, storico conservato');render();return;
+  case'del-yes':{progDoc.list=programs().filter(p=>p.id!==b.dataset.id);if(progDoc.active===b.dataset.id){const n=programs().find(p=>!p.archived)||programs()[0];progDoc.active=n.id;n.archived=false;dayIdx=nextDay();cur=null}confirmDel=null;saveProgs();toast('Scheda eliminata, storico conservato');render();return}
+  case'base-reset':confirmDel='base-reset';render();return;
+  case'base-reset-yes':{const b0=programs().find(p=>p.id==='base');if(b0){b0.days=clone(BASE_DAYS);b0.name='Scheda ipertrofia 4 giorni'}confirmDel=null;saveProgs();cur=null;toast('Scheda riportata all\'originale');render();return}
   case'extend':{const p=programs().find(x=>x.id===b.dataset.id);p.weeks=(p.weeks||8)+ +b.dataset.w;saveProgs();toast('Scheda prolungata a '+p.weeks+' settimane');render();return}
   case'new-prog':editProgram({id:uid(),name:'Nuova scheda',days:[newDay(0)],weeks:8,start:todayStr(),deload:[],archived:false,created:Date.now()},true,false);return;
   case'import':openImport();return;
@@ -1196,6 +1219,13 @@ document.addEventListener('click',e=>{
   case'ed-save-only':saveDraft(false);return;
   case'ed-cancel':draft=null;location.hash='schede';return;
   /* backup */
+  case'prefs-reset':prefs.sound=true;prefs.vib=true;prefs.step=15;prefs.dockMin=false;savePrefs();toast('Impostazioni riportate ai valori predefiniti');render();return;
+  case'wipe':$('#wipe-confirm').innerHTML=`<div class="confirm"><b>Cancelli allenamenti, schede, note e obiettivi?</b>Non si può annullare. Prima conviene esportare un backup.<div class="actions"><button class="btn small" data-act="bk-export">Esporta backup</button><button class="btn small danger" data-act="wipe-yes">Sì, cancella tutto</button><button class="btn small" data-act="wipe-no">Annulla</button></div></div>`;return;
+  case'wipe-no':$('#wipe-confirm').innerHTML='';return;
+  case'wipe-yes':{Object.keys(sessions).forEach(id=>{if(col)col.doc(id).delete().catch(()=>{})});sessions={};ls.set('scheda-sessions',{});
+    const name=prefs.name;prefs={ts:Date.now(),name,notes:{},goals:{},lib:{},sound:true,vib:true,step:15,dockMin:false};savePrefs();
+    progDoc={ts:Date.now(),active:'base',list:[{id:'base',name:'Scheda ipertrofia 4 giorni',days:clone(BASE_DAYS),weeks:8,start:todayStr(),deload:[],archived:false,created:Date.now()}]};saveProgs();
+    ls.set('scheda-program',null);dayIdx=0;cur=null;toast('Dati cancellati');render();return}
   case'bk-export':exportBackup();return;
   case'bk-apply':{const j=bkPending;bkPending=null;if(j)applyBackup(j);return}
   case'bk-cancel':bkPending=null;bkStatus('');return;
