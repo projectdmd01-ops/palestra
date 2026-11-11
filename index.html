@@ -97,8 +97,18 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .days button[aria-pressed="true"] small{color:inherit;opacity:.8}
 /* workout */
 .sesshead{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
-.ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;min-width:0}
+.ex{scroll-margin-top:170px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;min-width:0}
 .ex.cur{border-color:var(--accent-line);box-shadow:0 0 0 1px var(--accent-line)}
+.exc{display:flex;align-items:center;gap:12px;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left}
+.exc>div{flex:1;min-width:0}
+.exc b{display:block;font-family:var(--display);font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exc small{color:var(--muted);font-size:12px}
+.exc .st{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:12px;flex-shrink:0;color:var(--muted)}
+.exc.done{opacity:.6}.exc.done .st{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.exc.part .st{border-color:var(--fg);color:var(--fg)}
+.colhead{display:grid;grid-template-columns:30px minmax(0,1fr) 12px minmax(0,1fr) 46px;gap:6px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.colhead span:nth-child(2),.colhead span:nth-child(4){padding-left:10px}
+.intro{display:grid;gap:8px}.intro ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
 .ex.complete{border-color:var(--line2);opacity:.8}
 .ex-title{border:0;background:none;padding:0;text-align:left;display:block;width:100%}
 .ex-title h3{display:inline}
@@ -135,11 +145,16 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .seg button{border:0;background:transparent;padding:4px 8px;font-size:11px;font-weight:600;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface2);color:var(--fg)}
 .dmin{border:0;background:none;color:var(--muted);font-size:16px;width:28px;height:24px;flex-shrink:0}
-.dmain{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px}
+.dmain{display:flex;align-items:center;gap:6px}
+.dmain .dtime{flex:1}
+.dmain .go{height:44px;min-width:92px;padding:0 12px;border-radius:11px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
+.dmain .go.pause{background:transparent;color:var(--fg);border-color:var(--fg)}
+.dadj.ic{width:40px;font-size:18px}
+.dhint{font-size:10px;color:var(--dim);text-align:center;margin-top:-2px}
 .dtime{border:0;background:none;padding:0;min-width:0;font-family:var(--display);font-weight:700;font-size:32px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em;text-align:center}
 .dbox.running .dtime{color:var(--accent)}
 .dbox.done .dtime{color:var(--good)}
-.dadj{width:48px;height:34px;border-radius:10px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:600;font-size:15px}
+.dadj{width:46px;height:44px;flex-shrink:0;border-radius:10px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:600;font-size:15px}
 .dctrl{display:grid;grid-template-columns:1fr 2fr 1fr;gap:6px}
 .dctrl button{min-width:0;height:38px;border-radius:11px;border:1px solid var(--line2);background:var(--surface2);font-family:var(--display);font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase}
 .dctrl .go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:15px}
@@ -260,8 +275,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
   <div class="dtop"><div class="dlabel" id="dlabel"></div>
     <div class="seg" role="group" aria-label="Modalità"><button data-act="mode" data-m="rest" id="m-rest">Recupero</button><button data-act="mode" data-m="sw" id="m-sw">Cronometro</button></div>
     <button class="dmin" data-act="dock-min" id="dminbtn" aria-label="Riduci timer">▾</button></div>
-  <div class="dmain"><button class="dadj" data-act="adj" data-d="-15" id="adjm">−15</button><button class="dtime" id="dtime" data-act="rest-edit" aria-label="Modifica il tempo di recupero">0:00</button><button class="dadj" data-act="adj" data-d="15" id="adjp">+15</button></div>
-  <div class="dctrl"><button data-act="t-reset" id="t-reset">Azzera</button><button class="go" data-act="t-go" id="t-go">Start</button><button data-act="t-extra" id="t-extra">+30</button></div>
+  <div class="dmain"><button class="dadj ic" data-act="t-reset" id="t-reset" aria-label="Azzera">↺</button><button class="dadj" data-act="adj" data-d="-15" id="adjm">−15</button><button class="dtime" id="dtime" data-act="rest-edit" aria-label="Tocca per cambiare il tempo di recupero">0:00</button><button class="dadj" data-act="adj" data-d="15" id="adjp">+15</button><button class="dadj" data-act="t-extra" id="t-extra" hidden>Giro</button><button class="go" data-act="t-go" id="t-go">Start</button></div>
   <div class="dminrow"><span class="t" id="dmint">0:00</span><button class="go" data-act="t-go" id="t-go2">Start</button><button data-act="t-reset">↺</button></div>
 </div></div>
 <nav class="nav" aria-label="Menu"><div>
@@ -608,8 +622,8 @@ function render(){
   const days=$('#days');days.hidden=view!=='allenamento';
   if(view==='allenamento'){const nx=nextDay();days.innerHTML=p.days.map((d,i)=>`<button data-day="${i}" aria-pressed="${i===dayIdx}"><b>${esc(d.name)}</b><small>${i===nx?'Prossimo':esc(d.dow||'')}</small></button>`).join('')}
   const v=$('#view');
-  v.innerHTML=view==='allenamento'?renderWorkout():view==='progressi'?renderProgress():view==='schede'?renderPrograms():view==='libreria'?renderLibrary():view==='edit'?renderEditor():renderProfile();
   if(view==='allenamento')ensureCur();
+  v.innerHTML=view==='allenamento'?renderWorkout():view==='progressi'?renderProgress():view==='schede'?renderPrograms():view==='libreria'?renderLibrary():view==='edit'?renderEditor():renderProfile();
   updateDock();
 }
 
@@ -655,31 +669,34 @@ function renderWorkout(){
       if(k<n)tot++;if(x.done){if(k<n)done++;cnt++}
       const phKg=ph.kg!=null&&ph.kg!==''?ph.kg:(kgT?String(kgT):'');
       rows+=`<div class="set${x.done?' done':''}"><label for="kg-${slot}-${k}">${prSet.has(k)?'<span class="pr-star">★</span>':''}${k<n?'S'+(k+1):'+'+(k-n+1)}</label>
-      <div class="field"><input id="kg-${slot}-${k}" inputmode="decimal" autocomplete="off" data-ex="${exId}" data-k="${k}" data-f="kg" data-slot="${slot}" value="${esc(x.kg??'')}" placeholder="${esc(phKg)}" aria-label="Chili serie ${k+1}"><em>kg</em></div><span class="x">×</span>
-      <div class="field"><input id="rp-${slot}-${k}" inputmode="numeric" autocomplete="off" data-ex="${exId}" data-k="${k}" data-f="reps" data-slot="${slot}" value="${esc(x.reps??'')}" placeholder="${esc(ph.reps!=null&&ph.reps!==''?ph.reps:lo+'–'+hi)}" aria-label="Ripetizioni serie ${k+1}"><em>rip</em></div>
+      <div class="field"><input id="kg-${slot}-${k}" inputmode="decimal" autocomplete="off" data-ex="${exId}" data-k="${k}" data-f="kg" data-slot="${slot}" value="${esc(x.kg??'')}" placeholder="${esc(phKg)}" aria-label="Chili serie ${k+1}"></div><span class="x">×</span>
+      <div class="field"><input id="rp-${slot}-${k}" inputmode="numeric" autocomplete="off" data-ex="${exId}" data-k="${k}" data-f="reps" data-slot="${slot}" value="${esc(x.reps??'')}" placeholder="${esc(ph.reps!=null&&ph.reps!==''?ph.reps:lo+'–'+hi)}" aria-label="Ripetizioni serie ${k+1}"></div>
       <button class="check" data-act="done" data-ex="${exId}" data-k="${k}" data-slot="${slot}" aria-label="Serie ${k+1} fatta">✓</button></div>`;
     }
     const goal=prefs.goals[exId],gtxt=goal&&(goal.kg||goal.reps)?` · obiettivo ${goal.kg?fmtKg(goal.kg)+' kg':''}${goal.kg&&goal.reps?' × ':''}${goal.reps?goal.reps+' rip':''}`:'';
     const lastBox=a.last?`<div class="last"><span>Ultima volta, ${fmtDate(a.last.date)}:</span><b>${setsTxt(a.last.sets)}</b><span class="chip ${a.status}">${LABEL[a.status]}</span></div>`:`<div class="last"><span>Prima volta: scegli un carico che ti lasci ${esc(rir)} ripetizioni in riserva.</span></div>`;
     const note=prefs.notes[exId]||enote;
     const isCur=cur&&cur.slot===slot;
+    if(!isCur){const dn=Math.min(cnt,n);return`<button class="exc${dn>=n?' done':dn?' part':''}" data-act="focus" data-slot="${slot}"><span class="st">${dn>=n?'✓':dn+'/'+n}</span><div><b>${esc(c.n)}</b><small>${n} × ${lo}–${hi}${esc(rnote||'')} · rec ${fmtRest(rest)}${a.last?' · ultima '+setsTxt(a.last.sets.slice(0,1)):''}</small></div><span style="color:var(--muted)">›</span></button>`}
     return`<article class="ex${cnt>=n?' complete':''}${isCur?' cur':''}" data-card="${slot}">
       <div class="row"><div><span class="eyebrow">${esc(c.m)}${s.subs[slot]?' · al posto di '+esc(X(e[0]).n):''}${s.moved[slot]?' · <span style="color:var(--warn)">rimandato</span>':''}</span>
       <button class="ex-title" data-act="exinfo" data-ex="${exId}"><h3>${esc(c.n)}</h3> <span style="color:var(--muted)">›</span></button>
       <div class="meta">${n} × ${lo}–${hi}${esc(rnote||'')} · RIR ${esc(rir)} · rec ${fmtRest(rest)}${kgT?' · '+fmtKg(kgT)+' kg':''}${gtxt}</div></div>
-      <div class="ord"><button class="icon" data-act="up" data-pos="${pos}" ${pos===0?'disabled':''} aria-label="Sposta su">↑</button><button class="icon" data-act="down" data-pos="${pos}" ${pos===s.order.length-1?'disabled':''} aria-label="Sposta giù">↓</button></div></div>
+      <button class="icon" data-act="more" data-slot="${slot}" data-ex="${exId}" data-pos="${pos}" aria-label="Altre opzioni">⋯</button></div>
       ${lastBox}
       ${pw.deload&&a.last?`<div class="hint deload"><span>Scarico: prova ${a.lm.bw?'meno ripetizioni':fmtKg(Math.round(a.lm.top*0.9*4)/4)+' kg'} e ${Math.max(1,Math.ceil(n/2))} serie.</span></div>`:''}
       ${sug?`<div class="hint ${sug.cls}"><span>${sug.t}</span>${sug.kg?`<button class="btn small" data-act="apply-kg" data-ex="${exId}" data-kg="${sug.kg}" data-n="${nRows}">Applica</button>`:''}</div>`:''}
       ${note?`<div class="exnote">${esc(note)}</div>`:''}
+      <div class="colhead"><span></span><span>Kg</span><span></span><span>Ripetizioni</span><span style="text-align:center">Fatto</span></div>
       <div class="sets">${rows}</div>
-      <div class="actions"><button class="btn small" data-act="add-set" data-ex="${exId}">+ Serie</button><button class="btn small" data-act="swap" data-slot="${slot}">Macchina occupata?</button>${pos<s.order.length-1?`<button class="btn small" data-act="later" data-pos="${pos}">Fallo dopo</button>`:''}<button class="btn small ghost" data-act="exinfo" data-ex="${exId}">Note e storico</button><button class="btn small ghost" data-act="exmenu" data-slot="${slot}" data-ex="${exId}">⋯ Modifica</button></div>
+      <div class="actions"><button class="btn small" data-act="add-set" data-ex="${exId}">+ Aggiungi serie</button><button class="btn small" data-act="swap" data-slot="${slot}">Macchina occupata?</button></div>
     </article>`;
   }).join('');
   const pct=tot?Math.round(done/tot*100):0;
   const started=sessions[s.id]&&s.start;
   const att=attendance();
-  return`${progBanner(p)}
+  const intro=!prefs.seenIntro?`<section class="card intro"><span class="eyebrow">Come funziona</span><ol><li>Scrivi <b>kg</b> e <b>ripetizioni</b>: se sono uguali all'ultima volta, sono già scritti in grigio.</li><li>Tocca <b>✓</b> quando hai finito la serie.</li><li>Premi <b>Start</b> in basso per il recupero.</li><li>Finito un esercizio, si apre da solo il successivo. Tocca un esercizio chiuso per aprirlo.</li></ol><button class="btn small" data-act="intro-ok">Ho capito</button></section>`:'';
+  return`${intro}${progBanner(p)}
   ${att.dates.length?`<a class="banner ${att.v.c}" href="#progressi" style="text-decoration:none;color:inherit"><strong>Settimana ${att.thisWeek}/${att.goal} · ${att.v.t}</strong></a>`:''}
   <div class="sesshead"><span>${esc(d.name)}${d.dow?' · '+esc(d.dow):''}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="num">${done}/${tot}</span>${started?`<span class="num" id="elapsed">${fmtDur(Date.now()-s.start)}</span>`:''}</div>
   ${cards}
@@ -695,7 +712,7 @@ function ensureCur(){
 function setCur(slot,silent){
   const p=activeProg(),d=p.days[dayIdx],s=getSession(),exId=slotEx(s,slot);
   cur={slot,day:d.id,exId,rest:d.ex[slot][5]||90,name:X(exId).n};
-  if(T.mode==='rest'&&!T.running&&!T.paused){T.preset=cur.rest;T.left=cur.rest;T.done=false}
+  if(T.mode==='rest'&&!T.running&&!T.paused&&!T.hold){T.preset=cur.rest;T.left=cur.rest;T.done=false}
   document.querySelectorAll('.ex.cur').forEach(e=>e.classList.remove('cur'));const el=document.querySelector(`[data-card="${slot}"]`);if(el)el.classList.add('cur');
   updateDock();
 }
@@ -708,7 +725,7 @@ function beep(){if(prefs.sound!==false){try{audioUnlock();[0,.3,.6].forEach((o,i
   if(prefs.vib!==false){try{navigator.vibrate&&navigator.vibrate([250,120,250,120,400])}catch(e){}}}
 function tick(){
   if(T.running){T.left=(T.end-Date.now())/1000;if(T.left<=0){T.left=0;T.running=false;T.paused=false;T.done=true;T.doneAt=Date.now();beep();toast('Recupero finito: serie successiva')}}
-  if(T.done&&!T.running&&Date.now()-(T.doneAt||0)>4000){T.done=false;T.left=T.preset}
+  if(T.done&&!T.running&&Date.now()-(T.doneAt||0)>4000){T.done=false;T.hold=false;if(cur)T.preset=cur.rest;T.left=T.preset}
   updateDock();const el=view==='allenamento'&&$('#elapsed');if(el){const s=sessions[getSession().id];if(s&&s.start)el.textContent=fmtDur((s.end&&s.finished?s.end:Date.now())-s.start)}
   const sw=$('#swbig');if(sw)sw.textContent=fmtSw(swNow());
 }
@@ -721,17 +738,17 @@ function updateDock(){
   const go=$('#t-go'),go2=$('#t-go2');
   if(T.mode==='rest'){
     const txt=fmtClock(T.left);$('#dtime').textContent=txt;$('#dmint').textContent=txt;
-    $('#dlabel').innerHTML=T.done?'<b>Recupero finito</b>':cur?'<b>'+esc(cur.name)+'</b>':'Recupero';
+    $('#dlabel').innerHTML=T.done?'<b>Recupero finito</b>':T.hold&&T.holdName?'Recupero dopo <b>'+esc(T.holdName)+'</b>':cur?'<b>'+esc(cur.name)+'</b> · tocca il tempo per cambiarlo':'Recupero';
     box.classList.toggle('running',T.running);box.classList.toggle('done',T.done&&!T.running);
     const lab=T.running?'Pausa':T.paused?'Riprendi':'Start';go.textContent=lab;go2.textContent=lab;go.classList.toggle('pause',T.running);
     const st=prefs.step||15;$('#adjm').textContent='−'+st;$('#adjp').textContent='+'+st;$('#adjm').dataset.d=-st;$('#adjp').dataset.d=st;
-    $('#adjm').style.visibility='';$('#adjp').style.visibility='';$('#t-extra').textContent='+'+(st*2);$('#t-reset').textContent='Azzera';$('#dtime').disabled=false;
+    $('#adjm').hidden=false;$('#adjp').hidden=false;$('#t-extra').hidden=true;$('#dtime').disabled=false;
   }else{
     const txt=fmtSw(swNow());$('#dtime').textContent=txt;$('#dmint').textContent=txt;
     $('#dlabel').innerHTML='Cronometro'+(T.sw.laps.length?' · '+T.sw.laps.length+' giri':'');
     box.classList.toggle('running',T.sw.run);box.classList.remove('done');
     const lab=T.sw.run?'Pausa':T.sw.acc?'Riprendi':'Start';go.textContent=lab;go2.textContent=lab;go.classList.toggle('pause',T.sw.run);
-    $('#adjm').style.visibility='hidden';$('#adjp').style.visibility='hidden';$('#t-extra').textContent='Giro';$('#t-reset').textContent='Azzera';$('#dtime').disabled=true;
+    $('#adjm').hidden=true;$('#adjp').hidden=true;$('#t-extra').hidden=false;$('#t-extra').disabled=!T.sw.run;$('#dtime').disabled=true;
   }
   const need=T.running||T.sw.run||view==='allenamento';
   if(need&&!tInt)tInt=setInterval(tick,200);else if(!need&&tInt){clearInterval(tInt);tInt=null}
@@ -743,7 +760,7 @@ function timerGo(){
   else{if(T.done||T.left<=0){T.left=T.preset;T.done=false}T.end=Date.now()+T.left*1000;T.running=true;T.paused=false}
   updateDock();
 }
-function timerReset(){if(T.mode==='sw'){T.sw={acc:0,start:0,run:false,laps:[]};updateDock();return}T.running=false;T.paused=false;T.done=false;T.preset=cur?cur.rest:T.preset;T.left=T.preset;updateDock()}
+function timerReset(){if(T.mode==='sw'){T.sw={acc:0,start:0,run:false,laps:[]};updateDock();return}T.hold=false;T.running=false;T.paused=false;T.done=false;T.preset=cur?cur.rest:T.preset;T.left=T.preset;updateDock()}
 function timerAdj(d){if(T.mode!=='rest')return;if(T.running){T.end=Math.max(Date.now(),T.end+d*1000);T.left=(T.end-Date.now())/1000}else{T.left=Math.max(0,T.left+d);if(!T.paused)T.preset=Math.max(5,T.left);T.done=false}updateDock()}
 
 /* ================= Progressi ================= */
@@ -1142,11 +1159,13 @@ document.addEventListener('click',e=>{
       const r=records(ex,s.id),k1=num(x.kg)||0,r1=num(x.reps);
       if(r.n&&k1>0&&(e1rm(k1,r1)>r.e*1.0001||k1>r.kg)&&!(s.prs||[]).some(p=>p.ex===ex&&e1rm(p.kg,p.reps)>=e1rm(k1,r1))){s.prs=(s.prs||[]).filter(p=>p.ex!==ex);s.prs.push({ex,k,kg:k1,reps:r1});toast('★ Nuovo record: '+X(ex).n+' '+fmtKg(k1)+'×'+r1)}
       if(!s.start)s.start=Date.now();}
-    s.log[ex][k]=x;persist(s);if(cur&&cur.slot!==slot)setCur(slot);render();return}
+    s.log[ex][k]=x;persist(s);if(cur&&cur.slot!==slot)setCur(slot);
+    {const d=activeProg().days[dayIdx],need=d.ex[slot][1];if(x.done&&setsOf(s,ex).length>=need){const nx=s.order.find(sl=>sl!==slot&&setsOf(s,slotEx(s,sl)).length<d.ex[sl][1]);if(nx!=null){if(T.mode==='rest'&&!T.running){T.hold=true;T.holdName=X(ex).n;T.preset=d.ex[slot][5]||90;T.left=T.preset;T.paused=false;T.done=false}render();setTimeout(()=>{setCur(nx);render();const el=document.querySelector(`[data-card="${nx}"]`);if(el)el.scrollIntoView({block:'start',behavior:'smooth'});toast('Esercizio completato: avanti con '+X(slotEx(s,nx)).n)},350);return}}}
+    render();return}
   case'apply-kg':{const ex=b.dataset.ex;s.log[ex]=s.log[ex]||[];for(let k=0;k<+b.dataset.n;k++){const x=s.log[ex][k]||{};if(!x.done){s.log[ex][k]=Object.assign({},x,{kg:fmtKg(+b.dataset.kg)})}}persist(s);render();toast('Carico applicato: puoi sempre cambiarlo');return}
   case'add-set':{const ex=b.dataset.ex;s.extra[ex]=(s.extra[ex]||0)+1;persist(s);render();return}
-  case'up':case'down':{const p=+b.dataset.pos,q=act==='up'?p-1:p+1;[s.order[p],s.order[q]]=[s.order[q],s.order[p]];persist(s);render();return}
-  case'later':{const p=+b.dataset.pos;const sl=s.order.splice(p,1)[0];s.order.push(sl);s.moved[sl]=true;persist(s);cur=null;render();return}
+  case'up':case'down':{const p=+b.dataset.pos,q=act==='up'?p-1:p+1;[s.order[p],s.order[q]]=[s.order[q],s.order[p]];persist(s);closeSheet();render();return}
+  case'later':{const p=+b.dataset.pos;const sl=s.order.splice(p,1)[0];s.order.push(sl);s.moved[sl]=true;persist(s);closeSheet();cur=null;render();return}
   case'swap':{const slot=+b.dataset.slot,orig=activeProg().days[dayIdx].ex[slot][0],c=slotEx(s,slot);const opts=[orig,...(X(orig).a||[])].filter((v,i,a)=>a.indexOf(v)===i);
     openSheet(`<span class="eyebrow">${esc(X(orig).m)}</span><h2>Scegli un'alternativa</h2><p class="note">Stesse serie e ripetizioni. I carichi si salvano sull'esercizio che fai davvero.</p>${opts.map(id=>`<button class="alt${id===c?' on':''}" data-act="pick-alt" data-slot="${slot}" data-id="${id}"><span>${esc(X(id).n)}${id===orig?' <small>(originale)</small>':''}</span><small>${id===c?'in uso':''}</small></button>`).join('')}<button class="btn" data-act="alt-other" data-slot="${slot}">Cerca un altro esercizio</button>`);return}
   case'pick-alt':{const slot=+b.dataset.slot,id=b.dataset.id,orig=activeProg().days[dayIdx].ex[slot][0];if(id===orig)delete s.subs[slot];else s.subs[slot]=id;persist(s);closeSheet();cur=null;render();return}
@@ -1169,6 +1188,15 @@ document.addEventListener('click',e=>{
   case'm-del-yes':{const p=activeProg(),d=p.days[dayIdx],slot=+b.dataset.slot;d.ex.splice(slot,1);
     const sid=sessionId(p,d);if(sessions[sid]){const ss=sessions[sid];ss.order=(ss.order||[]).filter(i=>i!==slot).map(i=>i>slot?i-1:i);const subs={},mv={};Object.keys(ss.subs||{}).forEach(k=>{const i=+k;if(i!==slot)subs[i>slot?i-1:i]=ss.subs[k]});Object.keys(ss.moved||{}).forEach(k=>{const i=+k;if(i!==slot)mv[i>slot?i-1:i]=ss.moved[k]});ss.subs=subs;ss.moved=mv;persist(ss)}
     saveProgs();cur=null;closeSheet();toast('Esercizio tolto dalla scheda');render();return}
+  case'focus':setCur(+b.dataset.slot);render();{const el=document.querySelector(`[data-card="${b.dataset.slot}"]`);if(el)el.scrollIntoView({block:'start',behavior:'smooth'})}return;
+  case'more':{const slot=+b.dataset.slot,pos=+b.dataset.pos,exId=b.dataset.ex;
+    openSheet(`<span class="eyebrow">Opzioni</span><h2>${esc(X(exId).n)}</h2>
+    <button class="alt" data-act="exinfo" data-ex="${exId}"><span>Come si fa, storico e note</span><small>›</small></button>
+    <button class="alt" data-act="swap" data-slot="${slot}"><span>Cambia esercizio (macchina occupata)</span><small>›</small></button>
+    ${pos<s.order.length-1?`<button class="alt" data-act="later" data-pos="${pos}"><span>Fallo dopo (sposta in fondo)</span><small>›</small></button>`:''}
+    <div class="actions"><button class="btn" data-act="up" data-pos="${pos}" ${pos===0?'disabled':''}>↑ Sposta su</button><button class="btn" data-act="down" data-pos="${pos}" ${pos===s.order.length-1?'disabled':''}>↓ Sposta giù</button></div>
+    <button class="alt" data-act="exmenu" data-slot="${slot}" data-ex="${exId}"><span>Modifica serie, ripetizioni e recupero · cancella</span><small>›</small></button>`);return}
+  case'intro-ok':prefs.seenIntro=true;savePrefs();render();return;
   case'finish':{s.end=Date.now();s.finished=true;persist(s);render();summarySheet(s.id);return}
   }
   switch(act){
