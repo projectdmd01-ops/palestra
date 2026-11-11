@@ -119,10 +119,16 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .ovrow{display:grid;grid-template-columns:44px minmax(0,1fr) 62px 76px;gap:8px;align-items:center;padding:8px 10px 8px 8px;border-bottom:1px solid var(--line)}
 .ovrow button{border:0;background:transparent;text-align:left;padding:0}
 .ovname{padding:6px 0!important}
-.ovrest{height:46px;border:1px solid var(--line2)!important;border-radius:10px;background:var(--surface2)!important;text-align:center!important;font-family:var(--display);font-weight:600;font-size:var(--fs-m);font-variant-numeric:tabular-nums;line-height:1.1;padding:0 4px!important;color:var(--muted)}
+.ovrest{white-space:nowrap;letter-spacing:-.01em;height:46px;border:1px solid var(--line2)!important;border-radius:10px;background:var(--surface2)!important;text-align:center!important;font-family:var(--display);font-weight:600;font-size:var(--fs-s);font-variant-numeric:tabular-nums;line-height:1.1;padding:0 4px!important;color:var(--muted)}
 .ovrest small{display:block;font-size:var(--fs-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .ovrest.on{background:var(--fg)!important;color:var(--bg);border-color:var(--fg)!important}.ovrest.on small{color:var(--bg)}
 .ovrest.paused{border-color:var(--fg)!important;color:var(--fg)}
+.ovedit{display:grid;gap:10px;padding:12px 14px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.oe{display:grid;grid-template-columns:80px 46px minmax(0,1fr) 46px;gap:8px;align-items:center}
+.oeb{height:44px;border-radius:10px;border:1px solid var(--line2);background:var(--surface2);font-size:var(--fs-l);font-weight:600}
+.oev{position:relative;display:block;text-align:center;font-family:var(--display);font-weight:700;font-size:var(--fs-l)}
+.oev input{width:100%;height:44px;border:1px solid var(--line2);border-radius:10px;background:var(--surface);text-align:center;font-family:var(--display);font-weight:700;font-size:var(--fs-l);padding:0 28px 0 8px;font-variant-numeric:tabular-nums}
+.oev em{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:var(--fs-xs);color:var(--muted);font-family:var(--body);font-weight:400}
 .ovload{min-width:76px;height:46px;border:1px solid var(--line2)!important;border-radius:10px;background:var(--bg2)!important;text-align:center!important;font-family:var(--display);font-weight:700;font-size:var(--fs-l);font-variant-numeric:tabular-nums;line-height:1.05;padding:0 8px!important}
 .ovload small{font-size:var(--fs-xs);color:var(--muted)}
 .ovload.unset{border-style:dashed!important;color:var(--muted);font-size:var(--fs-m)}
@@ -647,6 +653,11 @@ function getLoad(exId,kgT){prefs.loads=prefs.loads||{};const l=prefs.loads[exId]
 function setLoad(exId,kg){prefs.loads=prefs.loads||{};prefs.loads[exId]={kg,ts:Date.now()};savePrefs()}
 function restBtnHtml(slot,rest){const d=activeProg().days[dayIdx]||{};const mine=T.mode==='rest'&&T.slot===slot&&T.day===d.id;
   if(mine&&T.running)return fmtClock(T.left)+'<small>pausa</small>';if(mine&&T.paused)return fmtClock(T.left)+'<small>riprendi</small>';if(mine&&T.done)return'0:00<small>finito</small>';return'▶ '+fmtRest(rest)}
+let editRow=null;
+function ovEditHtml(slot,exId,ld,rest){return`<div class="ovedit">
+  <div class="oe"><span class="eyebrow">Carico</span><button class="oeb" data-act="oe-kg" data-ex="${exId}" data-d="-2.5" aria-label="Meno 2,5 kg">−</button><label class="oev"><input id="oe-kg" inputmode="decimal" data-oekg="${exId}" value="${ld!=null?fmtKg(ld):''}" placeholder="kg" aria-label="Carico in kg"><em>kg</em></label><button class="oeb" data-act="oe-kg" data-ex="${exId}" data-d="2.5" aria-label="Più 2,5 kg">+</button></div>
+  <div class="oe"><span class="eyebrow">Recupero</span><button class="oeb" data-act="oe-rest" data-slot="${slot}" data-d="-15" aria-label="Meno 15 secondi">−</button><b class="oev num">${fmtRest(rest)}</b><button class="oeb" data-act="oe-rest" data-slot="${slot}" data-d="15" aria-label="Più 15 secondi">+</button></div>
+  <div class="actions" style="justify-content:space-between"><button class="btn small ghost" data-act="oe-bw" data-ex="${exId}">Corpo libero</button><button class="btn small primary" data-act="oe-close">Fatto</button></div></div>`}
 function quickDone(s,slot){
   const d=activeProg().days[dayIdx],e=d.ex[slot],exId=slotEx(s,slot),n=e[1],kg=getLoad(exId,e[7]);
   if(kg==null)return false;
@@ -725,7 +736,7 @@ function renderWorkout(){
     const note=prefs.notes[exId]||enote;
     const isCur=cur&&cur.slot===slot,dn=Math.min(cnt,n);
     if(view!=='registra'){const ld=getLoad(exId,kgT),bw=isBW(exId);missing+=(ld==null&&dn<n)?1:0;
-      return`<div class="ovrow${dn>=n?' done':dn?' part':''}"><button class="st" data-act="quick" data-slot="${slot}" aria-label="${dn>=n?'Annulla fatto':'Segna fatto come previsto'}">${dn>=n?'✓':dn?dn+'/'+n:''}</button><button class="ovname" data-act="focus" data-slot="${slot}"><b>${esc(c.n)}</b><small>${n}×${lo}–${hi}${esc(rnote||'')}${note?' · nota':''}</small></button><button class="ovrest" data-act="rowrest" data-slot="${slot}" data-rest-slot="${slot}" data-rest="${rest}" aria-label="Avvia recupero">${restBtnHtml(slot,rest)}</button><button class="ovload${ld==null?' unset':''}" data-act="loadedit" data-ex="${exId}" data-kgt="${kgT||''}">${ld==null?'+ kg':ld===0?'corpo<br>libero':fmtKg(ld)+'<small> kg</small>'}</button></div>`}
+      return`<div class="ovrow${dn>=n?' done':dn?' part':''}"><button class="st" data-act="quick" data-slot="${slot}" aria-label="${dn>=n?'Annulla fatto':'Segna fatto come previsto'}">${dn>=n?'✓':dn?dn+'/'+n:''}</button><button class="ovname" data-act="focus" data-slot="${slot}"><b>${esc(c.n)}</b><small>${n}×${lo}–${hi}${esc(rnote||'')}${note?' · nota':''}</small></button><button class="ovrest" data-act="rowrest" data-slot="${slot}" data-rest-slot="${slot}" data-rest="${rest}" aria-label="Avvia recupero">${restBtnHtml(slot,rest)}</button><button class="ovload${ld==null?' unset':''}" data-act="loadedit" data-slot="${slot}">${ld==null?'+ kg':ld===0?'corpo<br>libero':fmtKg(ld)+'<small> kg</small>'}</button></div>`+(editRow===slot?ovEditHtml(slot,exId,ld,rest):'')}
     if(!isCur)return'';
     return`<article class="ex${cnt>=n?' complete':''} cur" data-card="${slot}">
       <div class="row"><div><span class="eyebrow">${esc(c.m)}${s.subs[slot]?' · al posto di '+esc(X(e[0]).n):''}${s.moved[slot]?' · rimandato':''}</span>
@@ -1196,6 +1207,7 @@ document.addEventListener('input',e=>{
   if(t.id==='exq'){exQuery=t.value;const pos=t.selectionStart;render();const i=$('#exq');if(i){i.focus();try{i.setSelectionRange(pos,pos)}catch(_){}}return}
   if(t.id==='libq'){libQ=t.value;const pos=t.selectionStart;render();const i=$('#libq');if(i){i.focus();try{i.setSelectionRange(pos,pos)}catch(_){}}return}
   if(t.id==='pickq'){fillPicker(t.value);return}
+  if(t.dataset&&t.dataset.oekg){const v=num(t.value);if(!isNaN(v)&&v>=0){setLoad(t.dataset.oekg,v);const row=t.closest('.ovedit').previousElementSibling;const lb=row&&row.querySelector('.ovload');if(lb){lb.classList.remove('unset');lb.innerHTML=v===0?'corpo<br>libero':fmtKg(v)+'<small> kg</small>'}}return}
 });
 document.addEventListener('focusin',e=>{const t=e.target;if(t.dataset&&t.dataset.slot!=null&&view==='registra'){const sl=+t.dataset.slot;if(!cur||cur.slot!==sl)setCur(sl)}});
 document.addEventListener('change',e=>{
@@ -1208,7 +1220,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-act],[data-day]');if(!b)return;
-  if(b.dataset.day!=null){dayIdx=+b.dataset.day;cur=null;render();window.scrollTo(0,0);return}
+  if(b.dataset.day!=null){dayIdx=+b.dataset.day;cur=null;editRow=null;render();window.scrollTo(0,0);return}
   const act=b.dataset.act;
   switch(act){
   case'close':closeSheet();return;
@@ -1281,12 +1293,16 @@ document.addEventListener('click',e=>{
   case'start-log':ensureCur();location.hash='registra';return;
   case'quick':{const slot=+b.dataset.slot,exId=slotEx(s,slot),n=activeProg().days[dayIdx].ex[slot][1];
     if(setsOf(s,exId).length>=n){delete s.log[exId];s.prs=(s.prs||[]).filter(p=>p.ex!==exId);persist(s);render();toast('Annullato');return}
-    if(!quickDone(s,slot)){loadSheet(exId,activeProg().days[dayIdx].ex[slot][7],slot);return}
+    if(!quickDone(s,slot)){editRow=slot;render();setTimeout(()=>{const i=$('#oe-kg');if(i)i.focus()},50);toast('Scrivi il carico, poi tocca di nuovo il cerchio');return}
     persist(s);render();toast('✓ '+X(exId).n+' fatto');return}
   case'quick-all':{let miss=[];s.order.forEach(sl=>{const ex=slotEx(s,sl);if(setsOf(s,ex).length<activeProg().days[dayIdx].ex[sl][1]&&!quickDone(s,sl))miss.push(X(ex).n)});
     if(miss.length){persist(s);render();toast('Imposta prima il carico di: '+miss.slice(0,3).join(', ')+(miss.length>3?'…':''));return}
     s.end=Date.now();s.finished=true;persist(s);render();summarySheet(s.id);return}
-  case'loadedit':loadSheet(b.dataset.ex,b.dataset.kgt,null);return;
+  case'loadedit':{const sl=+b.dataset.slot;editRow=editRow===sl?null:sl;render();if(editRow!=null&&getLoad(slotEx(s,sl),activeProg().days[dayIdx].ex[sl][7])==null)setTimeout(()=>{const i=$('#oe-kg');if(i)i.focus()},50);return}
+  case'oe-close':editRow=null;render();return;
+  case'oe-kg':{const ex=b.dataset.ex,cur0=getLoad(ex,'')||0;setLoad(ex,Math.max(0,Math.round((cur0+ +b.dataset.d)*100)/100));render();return}
+  case'oe-bw':setLoad(b.dataset.ex,0);render();return;
+  case'oe-rest':{const e=activeProg().days[dayIdx].ex[+b.dataset.slot];e[5]=Math.max(15,Math.min(600,(e[5]||90)+ +b.dataset.d));clearTimeout(saveProgs._t);saveProgs._t=setTimeout(saveProgs,600);progDoc.ts=Date.now();ls.set('pd-programs',progDoc);if(cur&&cur.slot===+b.dataset.slot){cur.rest=e[5];if(!T.running&&!T.paused&&!T.hold){T.preset=e[5];T.left=e[5]}}render();return}
   case'ld':{const i=$('#ld-in');const v=(num(i.value)||0)+ +b.dataset.d;i.value=fmtKg(Math.max(0,Math.round(v*100)/100));return}
   case'ld-bw':$('#ld-in').value='0';return;
   case'ld-save':{const v=num($('#ld-in').value);if(isNaN(v)||v<0){toast('Scrivi un carico valido');return}setLoad(b.dataset.ex,v);closeSheet();
