@@ -109,11 +109,16 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .colhead{display:grid;grid-template-columns:30px minmax(0,1fr) 12px minmax(0,1fr) 46px;gap:6px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
 .colhead span:nth-child(2),.colhead span:nth-child(4){padding-left:10px}
 .ov{gap:0}
-.ovhead{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;padding:8px 14px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
+.ovhead{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px;padding:8px 14px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
 .ovhead span:last-child{text-align:right}
-.ovrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;width:100%}
+.ovrow{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px 8px 8px;border-bottom:1px solid var(--line)}
+.ovrow button{border:0;background:transparent;text-align:left;padding:0}
+.ovname{padding:6px 0!important}
+.ovload{min-width:76px;height:46px;border:1px solid var(--line2)!important;border-radius:10px;background:var(--bg2)!important;text-align:center!important;font-family:var(--display);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;line-height:1.05;padding:0 8px!important}
+.ovload small{font-size:11px;color:var(--muted)}
+.ovload.unset{border-style:dashed!important;color:var(--muted);font-size:14px}
 .ovrow:last-child{border-bottom:0}
-.ovrow .st{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:11px;color:var(--muted)}
+.ovrow .st{width:40px;height:40px;font-size:13px!important;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:11px;color:var(--muted)}
 .ovrow.done .st{background:var(--fg);border-color:var(--fg);color:var(--bg)}
 .ovrow.part .st{border-color:var(--fg);color:var(--fg)}
 .ovrow.done .ovname b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
@@ -622,6 +627,21 @@ function getSession(){
   return{id,date:todayStr(),day:d.id,dn:d.name,prog:p.id,pn:p.name,order:d.ex.map((_,i)=>i),subs:{},moved:{},extra:{},log:{},prs:[]};
 }
 const slotEx=(s,i)=>s.subs&&s.subs[i]?s.subs[i]:activeProg().days[dayIdx].ex[i][0];
+const BW_RE=/trazion|dip alle|alzate gambe|leg raise|crunch(?! alla macchina)|plank|ab wheel|flessioni|push ?up|back extension/i;
+function isBW(exId){return BW_RE.test(X(exId).n)}
+function getLoad(exId,kgT){prefs.loads=prefs.loads||{};const l=prefs.loads[exId];if(l&&l.kg!=null&&l.kg!=='')return+l.kg;
+  const h=history(exId);if(h.length){const m=metric(h[h.length-1].sets);return m.bw?0:m.top}
+  if(kgT!==''&&kgT!=null&&isFinite(+kgT)&&+kgT>0)return+kgT;return null}
+function setLoad(exId,kg){prefs.loads=prefs.loads||{};prefs.loads[exId]={kg,ts:Date.now()};savePrefs()}
+function quickDone(s,slot){
+  const d=activeProg().days[dayIdx],e=d.ex[slot],exId=slotEx(s,slot),n=e[1],kg=getLoad(exId,e[7]);
+  if(kg==null)return false;
+  const h=history(exId,s.id),last=h.length?h[h.length-1].sets:[];
+  s.log[exId]=s.log[exId]||[];const r=records(exId,s.id);
+  for(let k=0;k<n;k++){const x=s.log[exId][k]||{};if(x.done)continue;const reps=last[k]?num(last[k].reps):(last.length?num(last[last.length-1].reps):e[2]);s.log[exId][k]={kg:fmtKg(kg),reps:String(reps),done:true,q:true}}
+  if(r.n&&kg>0&&kg>r.kg){s.prs=(s.prs||[]).filter(p=>p.ex!==exId);s.prs.push({ex:exId,k:0,kg,reps:num(s.log[exId][0].reps)})}
+  if(!s.start)s.start=Date.now();return true;
+}
 
 /* ================= Render generale ================= */
 function render(){
@@ -668,7 +688,7 @@ function progBanner(p){
 function renderWorkout(){
   const p=activeProg();if(!p.days.length)return`<div class="empty"><b>La scheda attiva non ha giorni</b>Vai in Schede per modificarla.</div>`;
   const d=p.days[dayIdx],s=getSession(),pw=progWeek(p);
-  let tot=0,done=0;
+  let tot=0,done=0,missing=0;
   const cards=s.order.map((slot,pos)=>{
     const e=d.ex[slot],exId=slotEx(s,slot),c=X(exId);
     const[_,n,lo,hi,rir,rest,rnote,kgT,enote]=e;
@@ -680,7 +700,7 @@ function renderWorkout(){
     for(let k=0;k<nRows;k++){
       const x=log[k]||{},ph=lastSets[k]||lastSets[lastSets.length-1]||{};
       if(k<n)tot++;if(x.done){if(k<n)done++;cnt++}
-      const phKg=ph.kg!=null&&ph.kg!==''?ph.kg:(kgT?String(kgT):'');
+      const gl=getLoad(exId,kgT);const phKg=gl!=null?fmtKg(gl):ph.kg!=null&&ph.kg!==''?ph.kg:'';
       rows+=`<div class="set${x.done?' done':''}"><label for="kg-${slot}-${k}">${prSet.has(k)?'<span class="pr-star">★</span>':''}${k<n?'S'+(k+1):'+'+(k-n+1)}</label>
       <div class="field"><input id="kg-${slot}-${k}" inputmode="decimal" autocomplete="off" data-ex="${exId}" data-k="${k}" data-f="kg" data-slot="${slot}" value="${esc(x.kg??'')}" placeholder="${esc(phKg)}" aria-label="Chili serie ${k+1}"></div><span class="x">×</span>
       <div class="field"><input id="rp-${slot}-${k}" inputmode="numeric" autocomplete="off" data-ex="${exId}" data-k="${k}" data-f="reps" data-slot="${slot}" value="${esc(x.reps??'')}" placeholder="${esc(ph.reps!=null&&ph.reps!==''?ph.reps:lo+'–'+hi)}" aria-label="Ripetizioni serie ${k+1}"></div>
@@ -690,7 +710,8 @@ function renderWorkout(){
     const lastBox=a.last?`<div class="last"><span>Ultima volta, ${fmtDate(a.last.date)}:</span><b>${setsTxt(a.last.sets)}</b><span class="chip ${a.status}">${LABEL[a.status]}</span></div>`:`<div class="last"><span>Prima volta: scegli un carico che ti lasci ${esc(rir)} ripetizioni in riserva.</span></div>`;
     const note=prefs.notes[exId]||enote;
     const isCur=cur&&cur.slot===slot,dn=Math.min(cnt,n);
-    if(view!=='registra')return`<button class="ovrow${dn>=n?' done':dn?' part':''}" data-act="focus" data-slot="${slot}"><span class="st">${dn>=n?'✓':dn?dn+'/'+n:pos+1}</span><div class="ovname"><b>${esc(c.n)}</b><small>${esc(c.m)}${s.subs[slot]?' · sostituito':''}${note?' · nota':''}</small></div><div class="ovn"><b>${n}×${lo}–${hi}${esc(rnote||'')}</b><small>${dn?'oggi '+setsTxt(setsOf(s,exId).slice(-1)):a.last?setsTxt(a.last.sets.slice(0,1)):'nuovo'} · ${fmtRest(rest)}</small></div></button>`;
+    if(view!=='registra'){const ld=getLoad(exId,kgT),bw=isBW(exId);missing+=(ld==null&&dn<n)?1:0;
+      return`<div class="ovrow${dn>=n?' done':dn?' part':''}"><button class="st" data-act="quick" data-slot="${slot}" aria-label="${dn>=n?'Annulla fatto':'Segna fatto come previsto'}">${dn>=n?'✓':dn?dn+'/'+n:''}</button><button class="ovname" data-act="focus" data-slot="${slot}"><b>${esc(c.n)}</b><small>${n}×${lo}–${hi}${esc(rnote||'')} · rec ${fmtRest(rest)}${note?' · nota':''}</small></button><button class="ovload${ld==null?' unset':''}" data-act="loadedit" data-ex="${exId}" data-kgt="${kgT||''}">${ld==null?'+ kg':ld===0?'corpo<br>libero':fmtKg(ld)+'<small> kg</small>'}</button></div>`}
     if(!isCur)return'';
     return`<article class="ex${cnt>=n?' complete':''} cur" data-card="${slot}">
       <div class="row"><div><span class="eyebrow">${esc(c.m)}${s.subs[slot]?' · al posto di '+esc(X(e[0]).n):''}${s.moved[slot]?' · rimandato':''}</span>
@@ -719,14 +740,15 @@ function renderWorkout(){
     <div class="finish">${finishBtn}</div>`;
   }
   const att=attendance();
-  const intro=!prefs.seenIntro2?`<section class="card intro"><span class="eyebrow">Come funziona</span><ol><li>Qui vedi tutta la scheda di oggi: serie, ripetizioni, recupero e chili dell'ultima volta.</li><li>Tocca <b>Inizia allenamento</b> o un esercizio per registrare i dati.</li><li>In registrazione: kg, ripetizioni, <b>✓</b> per ogni serie e <b>Start</b> per il recupero.</li></ol><button class="btn small" data-act="intro-ok">Ho capito</button></section>`:'';
-  const startLbl=s.finished?'Rivedi i dati':done?`Continua allenamento · ${done}/${tot}`:'Inizia allenamento';
+  const intro=!prefs.seenIntro3?`<section class="card intro"><span class="eyebrow">Come funziona</span><ol><li>A destra di ogni esercizio c'è il tuo <b>carico</b>. La prima volta tocca <b>+ kg</b> e scrivilo: poi resta salvato.</li><li>Finito un esercizio, tocca il <b>cerchio</b> a sinistra: viene segnato fatto con il carico di sempre.</li><li>Quando aumenti, tocca il carico e scrivi il nuovo valore.</li><li>Vuoi segnare serie per serie? Tocca il nome dell'esercizio.</li></ol><button class="btn small" data-act="intro-ok">Ho capito</button></section>`:'';
+  const startLbl=s.finished?'Rivedi serie per serie':done?'Registra serie per serie':'Registra serie per serie';
   return`${intro}${progBanner(p)}
   ${att.dates.length?`<a class="banner ${att.v.c}" href="#progressi" style="text-decoration:none;color:inherit"><strong>Settimana ${att.thisWeek}/${att.goal} · ${att.v.t}</strong></a>`:''}
   ${head}
-  <div class="list ov"><div class="ovhead"><span>#</span><span>Esercizio</span><span>Serie · ultima · rec</span></div>${cards}</div>
-  <button class="btn primary block" data-act="start-log">${startLbl}</button>
-  ${s.finished?finishBtn:''}`;
+  ${missing?`<div class="banner info"><strong>Imposta i carichi</strong><span>Manca il carico per ${missing} ${missing===1?'esercizio':'esercizi'}: tocca <b>+ kg</b> e scrivilo una volta sola.</span></div>`:''}
+  <div class="list ov"><div class="ovhead"><span>Fatto</span><span>Esercizio</span><span>Carico</span></div>${cards}</div>
+  ${s.finished?finishBtn:`<button class="btn primary block" data-act="quick-all">✓ Allenamento fatto come previsto</button>`}
+  <button class="btn block ghost" data-act="start-log">${startLbl}</button>`;
 }
 function ensureCur(){
   const p=activeProg(),d=p.days[dayIdx];if(!d)return;const s=getSession();
@@ -1123,6 +1145,15 @@ function buildProgram(j){
 function openSheet(html){$('#sheetbody').innerHTML=html+`<button class="btn" data-act="close">Chiudi</button>`;$('#sheet').hidden=false;$('#sheetbody').scrollTop=0}
 function closeSheet(){$('#sheet').hidden=true;pickCtx=null}
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')closeSheet()});
+function loadSheet(exId,kgT,slot){
+  const cur0=getLoad(exId,kgT),h=history(exId);
+  openSheet(`<span class="eyebrow">Carico di lavoro</span><h2>${esc(X(exId).n)}</h2>
+  <p class="note">${h.length?'Ultima volta: '+setsTxt(h[h.length-1].sets)+'. ':''}Scrivilo una volta: resta salvato finché non lo cambi.</p>
+  <div class="stepper"><button class="icon" style="width:52px;height:52px;font-size:20px" data-act="ld" data-d="-2.5" aria-label="Meno 2,5 kg">−</button><input id="ld-in" class="search num" style="width:140px;text-align:center;font-size:30px;height:60px" inputmode="decimal" value="${cur0!=null?fmtKg(cur0):''}" placeholder="kg"><button class="icon" style="width:52px;height:52px;font-size:20px" data-act="ld" data-d="2.5" aria-label="Più 2,5 kg">+</button></div>
+  <div class="filters" style="justify-content:center;flex-wrap:wrap"><button data-act="ld" data-d="-1">−1</button><button data-act="ld" data-d="1">+1</button><button data-act="ld" data-d="5">+5</button><button data-act="ld-bw">Corpo libero</button></div>
+  <button class="btn primary block" data-act="ld-save" data-ex="${exId}" data-slot="${slot==null?'':slot}">${slot==null?'Salva carico':'Salva e segna fatto'}</button>`);
+  setTimeout(()=>{const i=$('#ld-in');if(i&&cur0==null)i.focus()},60);
+}
 function restEditSheet(){
   if(!cur){toast('Apri un allenamento per impostare il recupero');return}
   openSheet(`<span class="eyebrow">Recupero</span><h2>${esc(cur.name)}</h2><div class="stepper"><button class="icon" style="width:52px;height:52px;font-size:20px" data-act="rs" data-d="-15" aria-label="Meno 15 secondi">−</button><b id="rsv">${fmtRest(T.preset)}</b><button class="icon" style="width:52px;height:52px;font-size:20px" data-act="rs" data-d="15" aria-label="Più 15 secondi">+</button></div>
@@ -1180,7 +1211,7 @@ document.addEventListener('click',e=>{
     if(x.done){x.done=false;s.prs=(s.prs||[]).filter(p=>!(p.ex===ex&&p.k===k))}
     else{const kg=kgI.value.trim()||(isNaN(num(kgI.placeholder))?'':kgI.placeholder);const rp=rpI.value.trim()||(/^\d+$/.test(rpI.placeholder)?rpI.placeholder:'');
       if(rp===''){rpI.focus();toast('Scrivi le ripetizioni');return}
-      x.kg=kg===''?'0':kg;x.reps=rp;x.done=true;
+      x.kg=kg===''?'0':kg;x.reps=rp;x.done=true;{const kv=num(x.kg);const cl=getLoad(ex,'');if(kv>=0&&(cl==null||kv>cl))setLoad(ex,kv)}
       const r=records(ex,s.id),k1=num(x.kg)||0,r1=num(x.reps);
       if(r.n&&k1>0&&(e1rm(k1,r1)>r.e*1.0001||k1>r.kg)&&!(s.prs||[]).some(p=>p.ex===ex&&e1rm(p.kg,p.reps)>=e1rm(k1,r1))){s.prs=(s.prs||[]).filter(p=>p.ex!==ex);s.prs.push({ex,k,kg:k1,reps:r1});toast('★ Nuovo record: '+X(ex).n+' '+fmtKg(k1)+'×'+r1)}
       if(!s.start)s.start=Date.now();}
@@ -1215,6 +1246,18 @@ document.addEventListener('click',e=>{
     saveProgs();cur=null;closeSheet();toast('Esercizio tolto dalla scheda');render();return}
   case'focus':setCur(+b.dataset.slot);if(view!=='registra')location.hash='registra';else render();return;
   case'start-log':ensureCur();location.hash='registra';return;
+  case'quick':{const slot=+b.dataset.slot,exId=slotEx(s,slot),n=activeProg().days[dayIdx].ex[slot][1];
+    if(setsOf(s,exId).length>=n){delete s.log[exId];s.prs=(s.prs||[]).filter(p=>p.ex!==exId);persist(s);render();toast('Annullato');return}
+    if(!quickDone(s,slot)){loadSheet(exId,activeProg().days[dayIdx].ex[slot][7],slot);return}
+    persist(s);render();toast('✓ '+X(exId).n+' fatto');return}
+  case'quick-all':{let miss=[];s.order.forEach(sl=>{const ex=slotEx(s,sl);if(setsOf(s,ex).length<activeProg().days[dayIdx].ex[sl][1]&&!quickDone(s,sl))miss.push(X(ex).n)});
+    if(miss.length){persist(s);render();toast('Imposta prima il carico di: '+miss.slice(0,3).join(', ')+(miss.length>3?'…':''));return}
+    s.end=Date.now();s.finished=true;persist(s);render();summarySheet(s.id);return}
+  case'loadedit':loadSheet(b.dataset.ex,b.dataset.kgt,null);return;
+  case'ld':{const i=$('#ld-in');const v=(num(i.value)||0)+ +b.dataset.d;i.value=fmtKg(Math.max(0,Math.round(v*100)/100));return}
+  case'ld-bw':$('#ld-in').value='0';return;
+  case'ld-save':{const v=num($('#ld-in').value);if(isNaN(v)||v<0){toast('Scrivi un carico valido');return}setLoad(b.dataset.ex,v);closeSheet();
+    if(b.dataset.slot!==''){const sl=+b.dataset.slot;if(quickDone(s,sl)){persist(s);toast('✓ '+X(b.dataset.ex).n+' fatto')}}else toast('Carico salvato: '+(v?fmtKg(v)+' kg':'corpo libero'));render();return}
   case'lstep':{const pc=s.order.indexOf(cur.slot),nx=s.order[pc+ +b.dataset.d];if(nx!=null){setCur(nx);render();window.scrollTo(0,0)}return}
   case'more':{const slot=+b.dataset.slot,pos=+b.dataset.pos,exId=b.dataset.ex;
     openSheet(`<span class="eyebrow">Opzioni</span><h2>${esc(X(exId).n)}</h2>
@@ -1223,7 +1266,7 @@ document.addEventListener('click',e=>{
     ${pos<s.order.length-1?`<button class="alt" data-act="later" data-pos="${pos}"><span>Fallo dopo (sposta in fondo)</span><small>›</small></button>`:''}
     <div class="actions"><button class="btn" data-act="up" data-pos="${pos}" ${pos===0?'disabled':''}>↑ Sposta su</button><button class="btn" data-act="down" data-pos="${pos}" ${pos===s.order.length-1?'disabled':''}>↓ Sposta giù</button></div>
     <button class="alt" data-act="exmenu" data-slot="${slot}" data-ex="${exId}"><span>Modifica serie, ripetizioni e recupero · cancella</span><small>›</small></button>`);return}
-  case'intro-ok':prefs.seenIntro=true;prefs.seenIntro2=true;savePrefs();render();return;
+  case'intro-ok':prefs.seenIntro=true;prefs.seenIntro2=true;prefs.seenIntro3=true;savePrefs();render();return;
   case'finish':{s.end=Date.now();s.finished=true;persist(s);render();summarySheet(s.id);return}
   }
   switch(act){
