@@ -588,7 +588,9 @@ function records(exId,excludeId){
   h.forEach(x=>{const m=metric(x.sets);x.sets.forEach(s=>{const k=num(s.kg)||0,r=num(s.reps);if(k>0&&e1rm(k,r)>e){e=e1rm(k,r);eD=x.date}if(k>kg){kg=k;kgD=x.date}if(r>reps)reps=r});if(m.vol>vol){vol=m.vol;volD=x.date}});
   return{e,kg,vol,reps,eD,kgD,volD,n:h.length};
 }
+function slotFor(exId){for(const d of (activeProg()||{days:[]}).days)for(const e of d.ex)if(e[0]===exId)return e;return null}
 function analyze(exId,hi,nSets,excludeId){
+  if(hi==null){const e=slotFor(exId);if(e){hi=e[3];nSets=e[1]}}
   const h=history(exId,excludeId);
   if(!h.length)return{status:'none',h};
   const last=h[h.length-1],lm=metric(last.sets);
@@ -686,10 +688,10 @@ function attendance(){
 }
 function progBanner(p){
   const w=progWeek(p);
-  if(w.ended)return`<div class="banner bad"><strong>${esc(p.name)}: durata finita</strong><span>Sei alla settimana ${w.week} su ${w.weeks}. È il momento di rivalutare la scheda: puoi prolungarla o passare a una nuova.</span><div class="actions"><button class="btn small" data-act="extend" data-id="${p.id}" data-w="2">Prolunga 2 sett.</button><button class="btn small" data-act="extend" data-id="${p.id}" data-w="4">Prolunga 4 sett.</button><a class="btn small" href="#schede">Cambia scheda</a></div></div>`;
-  if(w.ending)return`<div class="banner warn"><strong>${w.left===0?'Ultima settimana':'Manca 1 settimana'} alla fine della scheda</strong><span>Settimana ${w.week} di ${w.weeks}. Prepara la prossima scheda o prolunga questa.</span><div class="actions"><button class="btn small" data-act="extend" data-id="${p.id}" data-w="2">Prolunga 2 sett.</button><a class="btn small" href="#schede">Vai alle schede</a></div></div>`;
-  if(w.deload)return`<div class="banner warn"><strong>Settimana di scarico</strong><span>Fai circa metà delle serie con il 10% di carico in meno e lascia 3–4 ripetizioni in riserva. I suggerimenti di aumento sono in pausa.</span></div>`;
-  return'';
+  const dlB=w.deload?`<div class="banner warn"><strong>Settimana di scarico</strong><span>Fai circa metà delle serie con il 10% di carico in meno e lascia 3–4 ripetizioni in riserva. I suggerimenti di aumento sono in pausa.</span></div>`:'';
+  if(w.ended)return dlB+`<div class="banner bad"><strong>${esc(p.name)}: durata finita</strong><span>Sei alla settimana ${w.week} su ${w.weeks}. È il momento di rivalutare la scheda: puoi prolungarla o passare a una nuova.</span><div class="actions"><button class="btn small" data-act="extend" data-id="${p.id}" data-w="2">Prolunga 2 sett.</button><button class="btn small" data-act="extend" data-id="${p.id}" data-w="4">Prolunga 4 sett.</button><a class="btn small" href="#schede">Cambia scheda</a></div></div>`;
+  if(w.ending)return dlB+`<div class="banner warn"><strong>${w.left===0?'Ultima settimana':'Manca 1 settimana'} alla fine della scheda</strong><span>Settimana ${w.week} di ${w.weeks}. Prepara la prossima scheda o prolunga questa.</span><div class="actions"><button class="btn small" data-act="extend" data-id="${p.id}" data-w="2">Prolunga 2 sett.</button><a class="btn small" href="#schede">Vai alle schede</a></div></div>`;
+  return dlB;
 }
 function renderWorkout(){
   const p=activeProg();if(!p.days.length)return`<div class="empty"><b>La scheda attiva non ha giorni</b>Vai in Schede per modificarla.</div>`;
@@ -971,7 +973,7 @@ let pickCtx=null;
 function pickerSheet(ctx){pickCtx=ctx;openSheet(`<h2>Scegli esercizio</h2><input class="search" id="pickq" type="search" placeholder="Cerca o scrivi un nome nuovo" autocomplete="off"><div id="picklist" class="list"></div>`);fillPicker('');setTimeout(()=>{const i=$('#pickq');if(i)i.focus()},60)}
 function fillPicker(q){
   const n=norm(q),all=Object.assign({},LIB,draft&&draft.newLib||{});
-  const ids=Object.keys(all).filter(id=>!n||norm(all[id].n).includes(n)||norm(all[id].m).includes(n)).sort((a,b)=>all[a].m.localeCompare(all[b].m)||all[a].n.localeCompare(all[b].n)).slice(0,60);
+  const ids=Object.keys(all).filter(id=>!n||norm(all[id].n).includes(n)||norm(all[id].m).includes(n)).sort((a,b)=>{const sc=id=>!n?0:norm(all[id].n)===n?0:norm(all[id].n).startsWith(n)?1:norm(all[id].n).split(' ').some(w=>w.startsWith(n))?2:3;return sc(a)-sc(b)||all[a].m.localeCompare(all[b].m)||all[a].n.localeCompare(all[b].n)}).slice(0,60);
   const exact=ids.some(id=>norm(all[id].n)===n);
   $('#picklist').innerHTML=(q.trim()&&!exact?`<div class="li" style="display:grid;gap:8px"><b>Crea «${esc(q.trim())}»</b><div class="actions"><select class="inp" id="newmus" style="flex:1">${MUSCLES.map(m=>`<option ${m===guessMuscle(q)?'selected':''}>${m}</option>`).join('')}</select><button class="btn primary" data-act="pick-new">Crea</button></div></div>`:'')+ids.map(id=>`<button class="li" data-act="pick-one" data-id="${id}"><div><b>${esc(all[id].n)}</b><small>${esc(all[id].m)}</small></div></button>`).join('');
 }
