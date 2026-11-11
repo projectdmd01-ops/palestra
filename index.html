@@ -108,6 +108,19 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
 .exc.part .st{border-color:var(--fg);color:var(--fg)}
 .colhead{display:grid;grid-template-columns:30px minmax(0,1fr) 12px minmax(0,1fr) 46px;gap:6px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600}
 .colhead span:nth-child(2),.colhead span:nth-child(4){padding-left:10px}
+.ov{gap:0}
+.ovhead{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;padding:8px 14px;font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--line)}
+.ovhead span:last-child{text-align:right}
+.ovrow{display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;text-align:left;width:100%}
+.ovrow:last-child{border-bottom:0}
+.ovrow .st{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:11px;color:var(--muted)}
+.ovrow.done .st{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.ovrow.part .st{border-color:var(--fg);color:var(--fg)}
+.ovrow.done .ovname b{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--dim)}
+.ovname{min-width:0}.ovname b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ovname small{font-size:11px;color:var(--muted)}
+.ovn{text-align:right;font-variant-numeric:tabular-nums}.ovn b{display:block;font-family:var(--display);font-size:15px;font-weight:600;white-space:nowrap}.ovn small{font-size:11px;color:var(--muted);white-space:nowrap}
+.lognav{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.lognav .btn{flex:1;padding:12px}.lognav.top .btn{flex:0}.lognav.top span{font-size:12px;color:var(--muted)}
 .intro{display:grid;gap:8px}.intro ol{margin:0;padding-left:20px;display:grid;gap:4px;font-size:14px}
 .ex.complete{border-color:var(--line2);opacity:.8}
 .ex-title{border:0;background:none;padding:0;text-align:left;display:block;width:100%}
@@ -279,7 +292,7 @@ body.no-dock main .wrap{padding-bottom:calc(90px + env(safe-area-inset-bottom,0p
   <div class="dminrow"><span class="t" id="dmint">0:00</span><button class="go" data-act="t-go" id="t-go2">Start</button><button data-act="t-reset">↺</button></div>
 </div></div>
 <nav class="nav" aria-label="Menu"><div>
-  <a href="#allenamento" data-v="allenamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/></svg>Allenati</a>
+  <a href="#allenamento" data-v="allenamento"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9v6M6 6v12M18 6v12M21 9v6M6 12h12"/></svg>Oggi</a>
   <a href="#progressi" data-v="progressi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 16l5-5 4 3 6-7"/></svg>Progressi</a>
   <a href="#schede" data-v="schede"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Schede</a>
   <a href="#libreria" data-v="libreria"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>Esercizi</a>
@@ -612,18 +625,18 @@ const slotEx=(s,i)=>s.subs&&s.subs[i]?s.subs[i]:activeProg().days[dayIdx].ex[i][
 
 /* ================= Render generale ================= */
 function render(){
-  document.querySelectorAll('.nav a').forEach(a=>a.setAttribute('aria-current',a.dataset.v===view.split(':')[0]||(view==='edit'&&a.dataset.v==='schede')?'page':'false'));
+  document.querySelectorAll('.nav a').forEach(a=>a.setAttribute('aria-current',a.dataset.v===view||(view==='edit'&&a.dataset.v==='schede')||(view==='registra'&&a.dataset.v==='allenamento')?'page':'false'));
   const ab=$('#athlete');ab.classList.toggle('unset',!prefs.name);ab.innerHTML=prefs.name?'Atleta <b>'+esc(prefs.name)+'</b>':'+ Aggiungi il tuo nome';
   const p=activeProg();if(dayIdx>=p.days.length||dayIdx<0)dayIdx=0;
-  const TITLES={allenamento:'Allenamento',progressi:'Progressi',schede:'Schede',libreria:'Esercizi',profilo:'Profilo',edit:'Modifica scheda'};
+  const TITLES={allenamento:'Scheda di oggi',registra:'Registra',progressi:'Progressi',schede:'Schede',libreria:'Esercizi',profilo:'Profilo',edit:'Modifica scheda'};
   $('#vtitle').textContent=TITLES[view]||'';
   const pw=progWeek(p);
-  $('#vsub').textContent=view==='allenamento'?(pw.ended?'Scheda conclusa':'Sett. '+pw.week+' / '+pw.weeks+(pw.deload?' · scarico':'')):'';
+  $('#vsub').textContent=view==='allenamento'||view==='registra'?(pw.ended?'Scheda conclusa':'Sett. '+pw.week+' / '+pw.weeks+(pw.deload?' · scarico':'')):'';
   const days=$('#days');days.hidden=view!=='allenamento';
   if(view==='allenamento'){const nx=nextDay();days.innerHTML=p.days.map((d,i)=>`<button data-day="${i}" aria-pressed="${i===dayIdx}"><b>${esc(d.name)}</b><small>${i===nx?'Prossimo':esc(d.dow||'')}</small></button>`).join('')}
   const v=$('#view');
-  if(view==='allenamento')ensureCur();
-  v.innerHTML=view==='allenamento'?renderWorkout():view==='progressi'?renderProgress():view==='schede'?renderPrograms():view==='libreria'?renderLibrary():view==='edit'?renderEditor():renderProfile();
+  if(view==='allenamento'||view==='registra')ensureCur();
+  v.innerHTML=view==='allenamento'||view==='registra'?renderWorkout():view==='progressi'?renderProgress():view==='schede'?renderPrograms():view==='libreria'?renderLibrary():view==='edit'?renderEditor():renderProfile();
   updateDock();
 }
 
@@ -676,10 +689,11 @@ function renderWorkout(){
     const goal=prefs.goals[exId],gtxt=goal&&(goal.kg||goal.reps)?` · obiettivo ${goal.kg?fmtKg(goal.kg)+' kg':''}${goal.kg&&goal.reps?' × ':''}${goal.reps?goal.reps+' rip':''}`:'';
     const lastBox=a.last?`<div class="last"><span>Ultima volta, ${fmtDate(a.last.date)}:</span><b>${setsTxt(a.last.sets)}</b><span class="chip ${a.status}">${LABEL[a.status]}</span></div>`:`<div class="last"><span>Prima volta: scegli un carico che ti lasci ${esc(rir)} ripetizioni in riserva.</span></div>`;
     const note=prefs.notes[exId]||enote;
-    const isCur=cur&&cur.slot===slot;
-    if(!isCur){const dn=Math.min(cnt,n);return`<button class="exc${dn>=n?' done':dn?' part':''}" data-act="focus" data-slot="${slot}"><span class="st">${dn>=n?'✓':dn+'/'+n}</span><div><b>${esc(c.n)}</b><small>${n} × ${lo}–${hi}${esc(rnote||'')} · rec ${fmtRest(rest)}${a.last?' · ultima '+setsTxt(a.last.sets.slice(0,1)):''}</small></div><span style="color:var(--muted)">›</span></button>`}
-    return`<article class="ex${cnt>=n?' complete':''}${isCur?' cur':''}" data-card="${slot}">
-      <div class="row"><div><span class="eyebrow">${esc(c.m)}${s.subs[slot]?' · al posto di '+esc(X(e[0]).n):''}${s.moved[slot]?' · <span style="color:var(--warn)">rimandato</span>':''}</span>
+    const isCur=cur&&cur.slot===slot,dn=Math.min(cnt,n);
+    if(view!=='registra')return`<button class="ovrow${dn>=n?' done':dn?' part':''}" data-act="focus" data-slot="${slot}"><span class="st">${dn>=n?'✓':dn?dn+'/'+n:pos+1}</span><div class="ovname"><b>${esc(c.n)}</b><small>${esc(c.m)}${s.subs[slot]?' · sostituito':''}${note?' · nota':''}</small></div><div class="ovn"><b>${n}×${lo}–${hi}${esc(rnote||'')}</b><small>${dn?'oggi '+setsTxt(setsOf(s,exId).slice(-1)):a.last?setsTxt(a.last.sets.slice(0,1)):'nuovo'} · ${fmtRest(rest)}</small></div></button>`;
+    if(!isCur)return'';
+    return`<article class="ex${cnt>=n?' complete':''} cur" data-card="${slot}">
+      <div class="row"><div><span class="eyebrow">${esc(c.m)}${s.subs[slot]?' · al posto di '+esc(X(e[0]).n):''}${s.moved[slot]?' · rimandato':''}</span>
       <button class="ex-title" data-act="exinfo" data-ex="${exId}"><h3>${esc(c.n)}</h3> <span style="color:var(--muted)">›</span></button>
       <div class="meta">${n} × ${lo}–${hi}${esc(rnote||'')} · RIR ${esc(rir)} · rec ${fmtRest(rest)}${kgT?' · '+fmtKg(kgT)+' kg':''}${gtxt}</div></div>
       <button class="icon" data-act="more" data-slot="${slot}" data-ex="${exId}" data-pos="${pos}" aria-label="Altre opzioni">⋯</button></div>
@@ -694,14 +708,25 @@ function renderWorkout(){
   }).join('');
   const pct=tot?Math.round(done/tot*100):0;
   const started=sessions[s.id]&&s.start;
+  const head=`<div class="sesshead"><span>${esc(d.name)}${d.dow?' · '+esc(d.dow):''}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="num">${done}/${tot}</span>${started?`<span class="num" id="elapsed">${fmtDur(Date.now()-s.start)}</span>`:''}</div>`;
+  const finishBtn=s.finished?`<div class="banner good"><strong>Allenamento concluso</strong><span>Durata ${fmtDur((s.end||Date.now())-s.start)}. Puoi ancora correggere i dati.</span></div><button class="btn block" data-act="summary" data-id="${s.id}">Vedi riepilogo</button>`:`<button class="btn block" data-act="finish" ${done?'':'disabled'}>Termina allenamento</button>`;
+  if(view==='registra'){
+    const pc=Math.max(0,s.order.indexOf(cur?cur.slot:s.order[0])),last=pc>=s.order.length-1;
+    return`${head}
+    <div class="lognav top"><a class="btn small ghost" href="#allenamento">‹ Scheda</a><span class="num">Esercizio ${pc+1} di ${s.order.length}</span></div>
+    ${cards}
+    <div class="lognav"><button class="btn" data-act="lstep" data-d="-1" ${pc===0?'disabled':''}>‹ Precedente</button>${last?'':`<button class="btn primary" data-act="lstep" data-d="1">Successivo ›</button>`}</div>
+    <div class="finish">${finishBtn}</div>`;
+  }
   const att=attendance();
-  const intro=!prefs.seenIntro?`<section class="card intro"><span class="eyebrow">Come funziona</span><ol><li>Scrivi <b>kg</b> e <b>ripetizioni</b>: se sono uguali all'ultima volta, sono già scritti in grigio.</li><li>Tocca <b>✓</b> quando hai finito la serie.</li><li>Premi <b>Start</b> in basso per il recupero.</li><li>Finito un esercizio, si apre da solo il successivo. Tocca un esercizio chiuso per aprirlo.</li></ol><button class="btn small" data-act="intro-ok">Ho capito</button></section>`:'';
+  const intro=!prefs.seenIntro2?`<section class="card intro"><span class="eyebrow">Come funziona</span><ol><li>Qui vedi tutta la scheda di oggi: serie, ripetizioni, recupero e chili dell'ultima volta.</li><li>Tocca <b>Inizia allenamento</b> o un esercizio per registrare i dati.</li><li>In registrazione: kg, ripetizioni, <b>✓</b> per ogni serie e <b>Start</b> per il recupero.</li></ol><button class="btn small" data-act="intro-ok">Ho capito</button></section>`:'';
+  const startLbl=s.finished?'Rivedi i dati':done?`Continua allenamento · ${done}/${tot}`:'Inizia allenamento';
   return`${intro}${progBanner(p)}
   ${att.dates.length?`<a class="banner ${att.v.c}" href="#progressi" style="text-decoration:none;color:inherit"><strong>Settimana ${att.thisWeek}/${att.goal} · ${att.v.t}</strong></a>`:''}
-  <div class="sesshead"><span>${esc(d.name)}${d.dow?' · '+esc(d.dow):''}</span><div class="bar"><i style="width:${pct}%"></i></div><span class="num">${done}/${tot}</span>${started?`<span class="num" id="elapsed">${fmtDur(Date.now()-s.start)}</span>`:''}</div>
-  ${cards}
-  <div class="finish">${s.finished?`<div class="banner good"><strong>Allenamento concluso</strong><span>Durata ${fmtDur((s.end||Date.now())-s.start)}. Puoi ancora correggere i dati.</span></div><button class="btn block" data-act="summary" data-id="${s.id}">Vedi riepilogo</button>`:`<button class="btn primary block" data-act="finish" ${done?'':'disabled'}>Termina allenamento</button>`}
-  <p class="note">I valori in grigio sono quelli dell'ultima volta: tocca ✓ per confermarli o scrivi i nuovi. Tutto si salva da solo.</p></div>`;
+  ${head}
+  <div class="list ov"><div class="ovhead"><span>#</span><span>Esercizio</span><span>Serie · ultima · rec</span></div>${cards}</div>
+  <button class="btn primary block" data-act="start-log">${startLbl}</button>
+  ${s.finished?finishBtn:''}`;
 }
 function ensureCur(){
   const p=activeProg(),d=p.days[dayIdx];if(!d)return;const s=getSession();
@@ -726,13 +751,13 @@ function beep(){if(prefs.sound!==false){try{audioUnlock();[0,.3,.6].forEach((o,i
 function tick(){
   if(T.running){T.left=(T.end-Date.now())/1000;if(T.left<=0){T.left=0;T.running=false;T.paused=false;T.done=true;T.doneAt=Date.now();beep();toast('Recupero finito: serie successiva')}}
   if(T.done&&!T.running&&Date.now()-(T.doneAt||0)>4000){T.done=false;T.hold=false;if(cur)T.preset=cur.rest;T.left=T.preset}
-  updateDock();const el=view==='allenamento'&&$('#elapsed');if(el){const s=sessions[getSession().id];if(s&&s.start)el.textContent=fmtDur((s.end&&s.finished?s.end:Date.now())-s.start)}
+  updateDock();const el=(view==='allenamento'||view==='registra')&&$('#elapsed');if(el){const s=sessions[getSession().id];if(s&&s.start)el.textContent=fmtDur((s.end&&s.finished?s.end:Date.now())-s.start)}
   const sw=$('#swbig');if(sw)sw.textContent=fmtSw(swNow());
 }
 const swNow=()=>T.sw.acc+(T.sw.run?Date.now()-T.sw.start:0);
 function fmtSw(ms){const t=Math.floor(ms/100),d=t%10,s=Math.floor(t/10)%60,m=Math.floor(t/600)%60,h=Math.floor(t/36000);return(h?h+':'+pad(m):pad(m))+':'+pad(s)+','+d}
 function updateDock(){
-  const box=$('#dbox'),mini=!!prefs.dockMin||(view!=='allenamento'&&!T.running&&!T.sw.run);box.classList.toggle('min',mini);document.body.classList.toggle('dock-min',mini);document.body.classList.toggle('no-dock',view==='edit');
+  const box=$('#dbox'),mini=!!prefs.dockMin||view!=='registra';box.classList.toggle('min',mini);document.body.classList.toggle('dock-min',mini);document.body.classList.toggle('no-dock',view!=='registra'&&!T.running&&!T.sw.run);
   $('#dminbtn').textContent=mini?'▴':'▾';$('#dminbtn').setAttribute('aria-label',mini?'Espandi timer':'Riduci timer');
   $('#m-rest').setAttribute('aria-pressed',T.mode==='rest');$('#m-sw').setAttribute('aria-pressed',T.mode==='sw');
   const go=$('#t-go'),go2=$('#t-go2');
@@ -750,7 +775,7 @@ function updateDock(){
     const lab=T.sw.run?'Pausa':T.sw.acc?'Riprendi':'Start';go.textContent=lab;go2.textContent=lab;go.classList.toggle('pause',T.sw.run);
     $('#adjm').hidden=true;$('#adjp').hidden=true;$('#t-extra').hidden=false;$('#t-extra').disabled=!T.sw.run;$('#dtime').disabled=true;
   }
-  const need=T.running||T.sw.run||view==='allenamento';
+  const need=T.running||T.sw.run||view==='allenamento'||view==='registra';
   if(need&&!tInt)tInt=setInterval(tick,200);else if(!need&&tInt){clearInterval(tInt);tInt=null}
 }
 function timerGo(){
@@ -1115,7 +1140,7 @@ document.addEventListener('input',e=>{
   if(t.id==='libq'){libQ=t.value;const pos=t.selectionStart;render();const i=$('#libq');if(i){i.focus();try{i.setSelectionRange(pos,pos)}catch(_){}}return}
   if(t.id==='pickq'){fillPicker(t.value);return}
 });
-document.addEventListener('focusin',e=>{const t=e.target;if(t.dataset&&t.dataset.slot!=null&&view==='allenamento'){const sl=+t.dataset.slot;if(!cur||cur.slot!==sl)setCur(sl)}});
+document.addEventListener('focusin',e=>{const t=e.target;if(t.dataset&&t.dataset.slot!=null&&view==='registra'){const sl=+t.dataset.slot;if(!cur||cur.slot!==sl)setCur(sl)}});
 document.addEventListener('change',e=>{
   const t=e.target;
   if(t.dataset&&t.dataset.ed){edInput(t.dataset.ed,t.value);if(t.tagName==='SELECT'||t.dataset.ed==='weeks')render();return}
@@ -1135,7 +1160,7 @@ document.addEventListener('click',e=>{
   case'adj':timerAdj(+b.dataset.d);return;
   case't-extra':if(T.mode==='sw'){if(!T.sw.run)return;const tot=swNow(),prev=T.sw.laps.length?T.sw.laps[T.sw.laps.length-1].tot:0;T.sw.laps.push({lap:tot-prev,tot});updateDock();if(view==='profilo')render()}else timerAdj((prefs.step||15)*2);return;
   case'mode':T.mode=b.dataset.m;updateDock();return;
-  case'dock-min':if(view!=='allenamento'&&!prefs.dockMin){location.hash='allenamento';return}prefs.dockMin=!prefs.dockMin;savePrefs();updateDock();return;
+  case'dock-min':if(view!=='registra'&&!prefs.dockMin){location.hash='registra';return}prefs.dockMin=!prefs.dockMin;savePrefs();updateDock();return;
   case'rest-edit':if(T.mode==='rest')restEditSheet();return;
   case'rs':restEditSheet.v=Math.max(5,Math.min(900,restEditSheet.v+ +b.dataset.d));$('#rsv').textContent=fmtRest(restEditSheet.v);return;
   case'rs-set':restEditSheet.v=+b.dataset.s;$('#rsv').textContent=fmtRest(restEditSheet.v);return;
@@ -1146,7 +1171,7 @@ document.addEventListener('click',e=>{
   case'sw-reset':T.sw={acc:0,start:0,run:false,laps:[]};render();return;
   case'step':prefs.step=+b.dataset.s;savePrefs();render();return;
   }
-  const s=view==='allenamento'?getSession():null;
+  const s=view==='allenamento'||view==='registra'?getSession():null;
   switch(act){
   case'done':{
     const ex=b.dataset.ex,k=+b.dataset.k,slot=+b.dataset.slot,row=b.closest('.set');
@@ -1160,7 +1185,7 @@ document.addEventListener('click',e=>{
       if(r.n&&k1>0&&(e1rm(k1,r1)>r.e*1.0001||k1>r.kg)&&!(s.prs||[]).some(p=>p.ex===ex&&e1rm(p.kg,p.reps)>=e1rm(k1,r1))){s.prs=(s.prs||[]).filter(p=>p.ex!==ex);s.prs.push({ex,k,kg:k1,reps:r1});toast('★ Nuovo record: '+X(ex).n+' '+fmtKg(k1)+'×'+r1)}
       if(!s.start)s.start=Date.now();}
     s.log[ex][k]=x;persist(s);if(cur&&cur.slot!==slot)setCur(slot);
-    {const d=activeProg().days[dayIdx],need=d.ex[slot][1];if(x.done&&setsOf(s,ex).length>=need){const nx=s.order.find(sl=>sl!==slot&&setsOf(s,slotEx(s,sl)).length<d.ex[sl][1]);if(nx!=null){if(T.mode==='rest'&&!T.running){T.hold=true;T.holdName=X(ex).n;T.preset=d.ex[slot][5]||90;T.left=T.preset;T.paused=false;T.done=false}render();setTimeout(()=>{setCur(nx);render();const el=document.querySelector(`[data-card="${nx}"]`);if(el)el.scrollIntoView({block:'start',behavior:'smooth'});toast('Esercizio completato: avanti con '+X(slotEx(s,nx)).n)},350);return}}}
+    {const d=activeProg().days[dayIdx],need=d.ex[slot][1];if(x.done&&setsOf(s,ex).length>=need){const nx=s.order.find(sl=>sl!==slot&&setsOf(s,slotEx(s,sl)).length<d.ex[sl][1]);if(nx!=null){if(T.mode==='rest'&&!T.running){T.hold=true;T.holdName=X(ex).n;T.preset=d.ex[slot][5]||90;T.left=T.preset;T.paused=false;T.done=false}render();setTimeout(()=>{setCur(nx);render();window.scrollTo({top:0,behavior:'smooth'});toast('Esercizio completato: avanti con '+X(slotEx(s,nx)).n)},350);return}}}
     render();return}
   case'apply-kg':{const ex=b.dataset.ex;s.log[ex]=s.log[ex]||[];for(let k=0;k<+b.dataset.n;k++){const x=s.log[ex][k]||{};if(!x.done){s.log[ex][k]=Object.assign({},x,{kg:fmtKg(+b.dataset.kg)})}}persist(s);render();toast('Carico applicato: puoi sempre cambiarlo');return}
   case'add-set':{const ex=b.dataset.ex;s.extra[ex]=(s.extra[ex]||0)+1;persist(s);render();return}
@@ -1188,7 +1213,9 @@ document.addEventListener('click',e=>{
   case'm-del-yes':{const p=activeProg(),d=p.days[dayIdx],slot=+b.dataset.slot;d.ex.splice(slot,1);
     const sid=sessionId(p,d);if(sessions[sid]){const ss=sessions[sid];ss.order=(ss.order||[]).filter(i=>i!==slot).map(i=>i>slot?i-1:i);const subs={},mv={};Object.keys(ss.subs||{}).forEach(k=>{const i=+k;if(i!==slot)subs[i>slot?i-1:i]=ss.subs[k]});Object.keys(ss.moved||{}).forEach(k=>{const i=+k;if(i!==slot)mv[i>slot?i-1:i]=ss.moved[k]});ss.subs=subs;ss.moved=mv;persist(ss)}
     saveProgs();cur=null;closeSheet();toast('Esercizio tolto dalla scheda');render();return}
-  case'focus':setCur(+b.dataset.slot);render();{const el=document.querySelector(`[data-card="${b.dataset.slot}"]`);if(el)el.scrollIntoView({block:'start',behavior:'smooth'})}return;
+  case'focus':setCur(+b.dataset.slot);if(view!=='registra')location.hash='registra';else render();return;
+  case'start-log':ensureCur();location.hash='registra';return;
+  case'lstep':{const pc=s.order.indexOf(cur.slot),nx=s.order[pc+ +b.dataset.d];if(nx!=null){setCur(nx);render();window.scrollTo(0,0)}return}
   case'more':{const slot=+b.dataset.slot,pos=+b.dataset.pos,exId=b.dataset.ex;
     openSheet(`<span class="eyebrow">Opzioni</span><h2>${esc(X(exId).n)}</h2>
     <button class="alt" data-act="exinfo" data-ex="${exId}"><span>Come si fa, storico e note</span><small>›</small></button>
@@ -1196,7 +1223,7 @@ document.addEventListener('click',e=>{
     ${pos<s.order.length-1?`<button class="alt" data-act="later" data-pos="${pos}"><span>Fallo dopo (sposta in fondo)</span><small>›</small></button>`:''}
     <div class="actions"><button class="btn" data-act="up" data-pos="${pos}" ${pos===0?'disabled':''}>↑ Sposta su</button><button class="btn" data-act="down" data-pos="${pos}" ${pos===s.order.length-1?'disabled':''}>↓ Sposta giù</button></div>
     <button class="alt" data-act="exmenu" data-slot="${slot}" data-ex="${exId}"><span>Modifica serie, ripetizioni e recupero · cancella</span><small>›</small></button>`);return}
-  case'intro-ok':prefs.seenIntro=true;savePrefs();render();return;
+  case'intro-ok':prefs.seenIntro=true;prefs.seenIntro2=true;savePrefs();render();return;
   case'finish':{s.end=Date.now();s.finished=true;persist(s);render();summarySheet(s.id);return}
   }
   switch(act){
@@ -1260,7 +1287,7 @@ document.addEventListener('click',e=>{
   case'bk-auto':{const ab=ls.get('pd-autobackup-prev',null);if(ab){bkPending=ab.data;$('#bk-status').innerHTML=`<div class="confirm">Recuperi la copia del ${fmtDate(ab.date)}? Viene unita ai dati attuali senza cancellare niente.<div class="actions"><button class="btn small primary" data-act="bk-apply">Recupera</button><button class="btn small" data-act="bk-cancel">Annulla</button></div></div>`}return}
   }
 });
-const VIEWS=['allenamento','progressi','schede','libreria','profilo','edit'];
+const VIEWS=['allenamento','registra','progressi','schede','libreria','profilo','edit'];
 function route(){const h=location.hash.slice(1);let v=VIEWS.includes(h)?h:'allenamento';if(v==='edit'&&!draft)v='schede';if(v!=='edit'&&view==='edit'&&draft&&h!=='edit'){draft=null}view=v;render();window.scrollTo(0,0)}
 window.addEventListener('hashchange',route);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
